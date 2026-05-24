@@ -1,0 +1,169 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: caddy-config
+data:
+  Caddyfile: |
+    {
+      auto_https off
+      servers {
+        protocols h1
+      }
+      default_bind 0.0.0.0
+    }
+
+    # -------------------------
+    # Hostname-based services
+    # -------------------------
+    http://go2rtc.home {
+      reverse_proxy 127.0.0.1:1984
+    }
+    http://immich.home {
+      reverse_proxy 127.0.0.1:2283
+    }
+    http://ntfy.home {
+      reverse_proxy 127.0.0.1:2586
+    }
+    http://grafana.home {
+      reverse_proxy 127.0.0.1:3000
+    }
+    http://budget.home {
+      reverse_proxy 127.0.0.1:5020
+    }
+    http://jupyter.home {
+      reverse_proxy 127.0.0.1:5200
+    }
+    http://technitium.home {
+      reverse_proxy 127.0.0.1:5380
+    }
+    http://memos.home {
+      reverse_proxy 127.0.0.1:5400
+    }
+    http://pgadmin.home {
+      reverse_proxy 127.0.0.1:5433
+    }
+    http://bentopdf.home {
+      reverse_proxy 127.0.0.1:5500
+    }
+    http://rclone.home {
+      reverse_proxy 127.0.0.1:5572
+    }
+    http://n8n.home {
+      reverse_proxy 127.0.0.1:5678
+    }
+    http://qdrant.home {
+      reverse_proxy 127.0.0.1:6333
+    }
+    http://redisinsight.home {
+      reverse_proxy 127.0.0.1:6380
+    }
+    http://filebrowser.home {
+      reverse_proxy 127.0.0.1:7000
+    }
+    http://beszel.home {
+      reverse_proxy 127.0.0.1:8090
+    }
+    http://dozzle.home {
+      reverse_proxy 127.0.0.1:8095
+    }
+    http://homeassistant.home {
+      reverse_proxy 127.0.0.1:8123
+    }
+    http://linkding.home {
+      reverse_proxy 127.0.0.1:9100
+    }
+    http://navidrome.home {
+      reverse_proxy 127.0.0.1:9200
+    }
+    http://baikal.home {
+      reverse_proxy 127.0.0.1:9300
+    }
+    http://agendav.home {
+      reverse_proxy 127.0.0.1:9301
+    }
+    http://owncloud.home {
+      reverse_proxy 127.0.0.1:9400
+    }
+    http://freshrss.home {
+      reverse_proxy 127.0.0.1:9500
+    }
+    http://prometheus.home {
+      reverse_proxy 127.0.0.1:9080
+    }
+    http://ollamallm.home {
+      reverse_proxy 127.0.0.1:11434
+    }
+    http://ollama.home {
+      reverse_proxy 127.0.0.1:11435
+    }
+    http://codeserver.home {
+      reverse_proxy 127.0.0.1:30080
+    }
+
+    # Homarr — reached via pod-local loopback since it's in the same pod
+    http://lab.home {
+      reverse_proxy 127.0.0.1:7575 {
+        header_up X-Real-IP {remote_host}
+      }
+    }
+
+    # -------------------------
+    # Main router → Homarr
+    # -------------------------
+    http:// {
+      reverse_proxy 127.0.0.1:7575 {
+        header_up X-Real-IP {remote_host}
+      }
+    }
+
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+    name: caddy-homarr
+spec:
+    # hostNetwork: true fixes host.containers.internal NXDOMAIN —
+    # Caddy now shares the host network and can reach all host-bound services
+    # via 127.0.0.1. Port mappings are removed as they conflict with hostNetwork.
+    hostNetwork: true
+    restartPolicy: Always
+
+    containers:
+        - name: caddy
+          image: caddy:latest
+          imagePullPolicy: IfNotPresent
+          # Port 80 bound directly on host via hostNetwork — no mapping needed
+          volumeMounts:
+              - name: caddy-config
+                mountPath: /etc/caddy/Caddyfile
+                subPath: Caddyfile
+
+        - name: homarr
+          image: ghcr.io/ajnart/homarr:latest
+          imagePullPolicy: IfNotPresent
+          env:
+              - name: NEXTAUTH_URL
+                value: "http://lab.home"
+              - name: BASE_URL
+                value: "http://lab.home"
+              - name: HOSTNAME
+                value: "0.0.0.0"
+              - name: DISABLE_UPGRADE_MODAL
+                value: "true"
+          volumeMounts:
+              - name: homarr-data
+                mountPath: /app/data/configs
+              - name: homarr-data
+                mountPath: /app/public/icons
+              - name: homarr-data
+                mountPath: /data
+
+    volumes:
+        - name: caddy-config
+          configMap:
+              name: caddy-config
+        - name: homarr-data
+          hostPath:
+              path: ${PERSISTANT_PATH}/caddy-homarr
+              type: DirectoryOrCreate

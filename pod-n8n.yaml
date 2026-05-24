@@ -1,0 +1,73 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: n8n
+  labels:
+    app: n8n
+spec:
+  restartPolicy: Always
+  hostNetwork: true
+  containers:
+    - name: n8n
+      image: docker.io/n8nio/n8n:2.14.1
+      env:
+        - name: N8N_HOST
+          value: "lab-home.tail359ab2.ts.net"
+        - name: N8N_PORT
+          value: "5678"
+        - name: N8N_PROTOCOL
+          value: "http"
+        - name: N8N_WEBHOOK_URL
+          value: "https://lab-home.tail359ab2.ts.net"
+        - name: N8N_SECURE_COOKIE
+          value: "false"
+        - name: GENERIC_TIMEZONE
+          value: "America/New_York"
+        - name: N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS
+          value: "false"
+        - name: DB_TYPE
+          value: "postgresdb"
+        - name: DB_POSTGRESDB_HOST
+          value: "127.0.0.1"
+        - name: DB_POSTGRESDB_PORT
+          value: "5432"
+        - name: DB_POSTGRESDB_DATABASE
+          value: "n8n"
+        - name: N8N_RUNNERS_MODE
+          value: "internal"
+        - name: N8N_DIAGNOSTICS_ENABLED
+          value: "false"
+        - name: N8N_VERSION_NOTIFICATIONS_ENABLED
+          value: "false"
+        - name: N8N_TEMPLATES_ENABLED
+          value: "false"
+        - name: N8N_LISTEN_ADDRESS
+          value: "0.0.0.0"
+        - name: N8N_ENCRYPTION_KEY
+          value: "${N8N_ENCRYPTION_KEY}"
+        - name: DB_POSTGRESDB_USER
+          value: "${POSTGRES_USER}"
+        - name: DB_POSTGRESDB_PASSWORD
+          value: "${POSTGRES_PASSWORD}"
+        - name: EXECUTIONS_DATA_PRUNE
+          value: "true"
+        - name: EXECUTIONS_DATA_MAX_AGE
+          value: "1"       # in hours
+        - name: EXECUTIONS_DATA_PRUNE_MAX_COUNT
+          value: "10000"
+      volumeMounts:
+        - mountPath: /home/node/.n8n
+          name: n8n-data
+        - mountPath: /etc/localtime
+          name: localtime
+          readOnly: true
+  volumes:
+    - name: n8n-data
+      hostPath:
+        path: ${PERSISTANT_PATH}/n8n
+        type: Directory
+    - name: localtime
+      hostPath:
+        path: /etc/localtime
+        type: File

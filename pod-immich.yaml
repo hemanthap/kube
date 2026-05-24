@@ -1,0 +1,61 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: immich
+  labels:
+    app: immich
+spec:
+  restartPolicy: Always
+  hostNetwork: true
+  containers:
+    - name: immich
+      image: ghcr.io/immich-app/immich-server:release
+      env:
+        - name: DB_HOSTNAME
+          value: "127.0.0.1"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_DATABASE_NAME
+          value: "immich"
+        - name: REDIS_HOSTNAME
+          value: "127.0.0.1"
+        - name: REDIS_PORT
+          value: "6379"
+        - name: REDIS_DBINDEX
+          value: "0"
+        - name: MACHINE_LEARNING_ENABLED
+          value: "false"
+        - name: MACHINE_LEARNING_URL
+          value: ""
+        - name: IMMICH_MEDIA_LOCATION
+          value: "/usr/src/app/upload"
+        - name: UPLOAD_LOCATION
+          value: "/usr/src/app/upload"
+        - name: IMMICH_HOST
+          value: "0.0.0.0"
+        - name: IMMICH_PORT
+          value: "2283"
+        - name: IMMICH_IGNORE_MOUNT_CHECK_ERRORS
+          value: "true"
+        - name: DB_USERNAME
+          value: "${POSTGRES_USER}"
+        - name: DB_PASSWORD
+          value: "${POSTGRES_PASSWORD}"
+      ports:
+        - containerPort: 2283
+      volumeMounts:
+        - mountPath: /usr/src/app/upload
+          name: immich-upload
+        - mountPath: /etc/localtime
+          name: localtime
+          readOnly: true
+  volumes:
+    - name: immich-upload
+      hostPath:
+        path: /home/admin/immich-media
+        type: Directory
+    - name: localtime
+      hostPath:
+        path: /etc/localtime
+        type: File

@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: actualbudget
+spec:
+  restartPolicy: Always
+  securityContext:
+    seLinuxOptions:
+      level: s0
+      type: unconfined_t
+  containers:
+    - name: actualbudget
+      image: docker.io/actualbudget/actual-server:latest
+      ports:
+        - containerPort: 5006
+          hostPort: 5020
+      volumeMounts:
+        - mountPath: /data
+          name: data
+      securityContext:
+        seLinuxOptions:
+          level: s0
+          type: unconfined_t
+  volumes:
+    - name: data
+      hostPath:
+        path: ${PERSISTANT_PATH}/actualbudget
+        type: DirectoryOrCreate

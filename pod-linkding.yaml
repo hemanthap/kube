@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: linkding
+spec:
+  restartPolicy: Always
+  hostNetwork: true
+  containers:
+    - name: linkding
+      image: docker.io/sissbruecker/linkding:latest
+      imagePullPolicy: IfNotPresent
+      env:
+        - name: LD_DISABLE_AUTHENTICATION
+          value: "true"
+        - name: LD_DB_ENGINE
+          value: "postgres"
+        - name: LD_DB_HOST
+          value: "127.0.0.1"
+        - name: LD_DB_PORT
+          value: "5432"
+        - name: LD_DB_DATABASE
+          value: "linkding"
+        - name: LD_SUPERUSER_NAME
+          value: "${LINKDING_SUPERUSER_NAME}"
+        - name: LD_DB_USER
+          value: "${POSTGRES_USER}"
+        - name: LD_SUPERUSER_PASSWORD
+          value: "${LINKDING_SUPERUSER_PASSWORD}"
+        - name: LD_DB_PASSWORD
+          value: "${POSTGRES_PASSWORD}"
+        - name: LD_SERVER_PORT
+          value: "9100"
+      ports:
+        - containerPort: 9100

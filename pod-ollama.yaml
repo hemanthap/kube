@@ -1,0 +1,73 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ollama
+  labels:
+    app: ollama
+spec:
+  restartPolicy: Always
+  containers:
+    - name: ollama
+      image: docker.io/ollama/ollama:latest
+      ports:
+        - containerPort: 11434
+          hostPort: 11434
+          name: http
+      env:
+        - name: OLLAMA_HOST
+          value: "0.0.0.0"
+        - name: OLLAMA_MODELS
+          value: "/ollama/models"
+        - name: OLLAMA_NUM_PARALLEL
+          value: "1"          # avoid context switching between requests
+        - name: OLLAMA_MAX_LOADED_MODELS
+          value: "1"          # don't load multiple models simultaneously
+        - name: OLLAMA_KEEP_ALIVE
+          value: "30m"        # keep model warm in memory between requests
+        - name: OLLAMA_NUM_THREAD
+          value: "6"          # pin to all 6 physical cores explicitly
+      volumeMounts:
+        - mountPath: /ollama/models
+          name: ollama-data
+      resources:
+        requests:
+          memory: "2Gi"
+          cpu: "2000m"
+        limits:
+          memory: "10Gi"
+          cpu: "6000m"
+
+    - name: open-webui
+      image: ghcr.io/open-webui/open-webui:main
+      ports:
+        - containerPort: 8080
+          hostPort: 11435
+          name: http-webui
+      env:
+        - name: OLLAMA_BASE_URL
+          value: "http://localhost:11434"
+        - name: DATA_DIR
+          value: "/app/backend/data"
+        - name: WEBUI_SECRET_KEY
+          value: "${OLLAMA_WEBUI_SECRET_KEY}"
+      volumeMounts:
+        - mountPath: /app/backend/data
+          name: webui-data
+      resources:
+        requests:
+          memory: "256Mi"
+          cpu: "250m"
+        limits:
+          memory: "1Gi"
+          cpu: "1000m"
+
+  volumes:
+    - name: ollama-data
+      hostPath:
+        path: ${PERSISTANT_PATH}/ollama
+        type: DirectoryOrCreate
+    - name: webui-data
+      hostPath:
+        path: ${PERSISTANT_PATH}/open-webui
+        type: DirectoryOrCreate

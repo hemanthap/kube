@@ -1,0 +1,71 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tailscale
+spec:
+  hostNetwork: true
+  securityContext:
+    seLinuxOptions:
+      type: spc_t
+  containers:
+    - name: tailscale
+      image: tailscale/tailscale:latest
+      command:
+        - /bin/sh
+        - -c
+        - |
+          sysctl -w net.ipv4.ip_forward=1
+          sysctl -w net.ipv6.conf.all.forwarding=1
+
+          /usr/local/bin/tailscaled \
+            --tun=userspace-networking \
+            --state=/var/lib/tailscale/tailscaled.state \
+            --socket=/var/run/tailscale/tailscaled.sock \
+            --outbound-http-proxy-listen=localhost:1055 &
+          DAEMON_PID=$!
+
+          until /usr/local/bin/tailscale status > /dev/null 2>&1; do
+            echo "Waiting for tailscaled..."
+            sleep 1
+          done
+
+          /usr/local/bin/tailscale up \
+            --authkey="${TS_AUTHKEY}" \
+            --advertise-exit-node \
+            --advertise-routes=192.168.68.0/24 \
+            --accept-dns=false \
+            --hostname="${TS_HOSTNAME}" \
+            --reset
+
+          until /usr/local/bin/tailscale status | grep -q "^100\."; do
+            echo "Waiting for Tailscale auth..."
+            sleep 2
+          done
+
+          # Use host IP instead of localhost for userspace networking
+          /usr/local/bin/tailscale funnel --https=443 --bg http://192.168.68.50:5678
+
+          wait $DAEMON_PID
+      securityContext:
+        privileged: true
+        seLinuxOptions:
+          type: spc_t
+      env:
+        - name: TS_HOSTNAME
+          value: "fedora-server"
+      envFrom:
+        - secretRef:
+            name: app-secrets
+      volumeMounts:
+        - name: data
+          mountPath: /var/lib/tailscale
+        - name: run
+          mountPath: /var/run/tailscale
+  volumes:
+    - name: data
+      hostPath:
+        path: ${PERSISTANT_PATH}/tailscale
+        type: DirectoryOrCreate
+    - name: run
+      emptyDir: {}

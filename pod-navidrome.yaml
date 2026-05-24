@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: navidrome
+spec:
+  restartPolicy: Always
+  containers:
+    - name: navidrome
+      image: docker.io/deluan/navidrome:latest
+      env:
+      - name: ND_AUTHREQUESTLIMIT
+        value: "0"
+      - name: ND_REVERSEPROXYWHITELIST
+        value: "0.0.0.0/0"
+      - name: ND_REVERSEPROXYUSERHEADER
+        value: "X-Remote-User"
+      envFrom:
+        - secretRef:
+            name: app-secrets
+      ports:
+        - containerPort: 4533
+          hostPort: 9200
+      volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: music
+          mountPath: /music
+  volumes:
+    - name: data
+      hostPath:
+        path: ${PERSISTANT_PATH}/navidrome/data
+        type: DirectoryOrCreate
+    - name: music
+      hostPath:
+        path: ${PERSISTANT_PATH}/navidrome/music
+        type: DirectoryOrCreate

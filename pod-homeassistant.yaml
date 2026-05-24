@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ha-configuration
+data:
+  configuration.yaml: |
+    http:
+      use_x_forwarded_for: true
+      trusted_proxies:
+        - 127.0.0.1
+        - ::1
+        - 192.168.68.0/24
+        - 10.88.0.0/16
+
+    default_config:
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: homeassistant
+  labels:
+    app: homeassistant
+spec:
+  hostNetwork: true
+  restartPolicy: Always
+
+  containers:
+    - name: homeassistant
+      image: ghcr.io/home-assistant/home-assistant:stable
+
+      env:
+        - name: TZ
+          value: "America/New_York"
+      envFrom:
+        - secretRef:
+            name: app-secrets
+
+      volumeMounts:
+        - name: ha-config
+          mountPath: /config
+        - name: ha-configuration
+          mountPath: /config/configuration.yaml
+          subPath: configuration.yaml
+
+      securityContext:
+        privileged: false
+        capabilities:
+          add:
+            - NET_ADMIN
+            - NET_RAW
+
+  volumes:
+    - name: ha-config
+      hostPath:
+        path: ${PERSISTANT_PATH}/homeassistant
+        type: DirectoryOrCreate
+
+    - name: ha-configuration
+      configMap:
+        name: ha-configuration

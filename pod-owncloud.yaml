@@ -1,0 +1,61 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: owncloud
+  labels:
+    app: owncloud
+spec:
+  restartPolicy: Always
+  containers:
+    - name: owncloud
+      image: docker.io/owncloud/server:10.15
+      env:
+        - name: OWNCLOUD_DOMAIN
+          value: "owncloud.home"
+        - name: OWNCLOUD_TRUSTED_DOMAINS
+          value: "owncloud.home"
+        - name: OWNCLOUD_DB_TYPE
+          value: "pgsql"
+        - name: OWNCLOUD_DB_HOST
+          value: "192.168.68.50"          # ← shared postgres pod
+        - name: OWNCLOUD_DB_PORT
+          value: "5432"
+        - name: OWNCLOUD_DB_NAME
+          value: "owncloud"
+        - name: OWNCLOUD_REDIS_ENABLED
+          value: "true"
+        - name: OWNCLOUD_REDIS_HOST
+          value: "192.168.68.50"             # ← shared redis pod
+        - name: OWNCLOUD_REDIS_PORT
+          value: "6379"
+        - name: OWNCLOUD_REDIS_DB
+          value: "1"                 # ← DB index 1 (immich uses 0)
+        - name: OWNCLOUD_VOLUME_DATA
+          value: "/mnt/data"
+        - name: OWNCLOUD_DB_USERNAME
+          value: "${POSTGRES_USER}"
+        - name: OWNCLOUD_DB_PASSWORD
+          value: "${POSTGRES_PASSWORD}"
+        - name: OWNCLOUD_ADMIN_USERNAME
+          value: "${OWNCLOUD_ADMIN_USERNAME}"
+        - name: OWNCLOUD_ADMIN_PASSWORD
+          value: "${OWNCLOUD_ADMIN_PASSWORD}"
+      ports:
+        - containerPort: 8080
+          hostPort: 9400
+      volumeMounts:
+        - mountPath: /mnt/data
+          name: owncloud-data
+        - mountPath: /etc/localtime
+          name: localtime
+          readOnly: true
+  volumes:
+    - name: owncloud-data
+      hostPath:
+        path: ${PERSISTANT_PATH}/owncloud
+        type: DirectoryOrCreate
+    - name: localtime
+      hostPath:
+        path: /etc/localtime
+        type: File

@@ -1,0 +1,105 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: jdk-ssh-config
+data:
+    sshd_config: |
+        Port 22
+        PermitRootLogin no
+        PasswordAuthentication yes
+        PubkeyAuthentication yes
+        AuthorizedKeysFile .ssh/authorized_keys
+        UsePAM yes
+        X11Forwarding no
+        PrintMotd no
+        AcceptEnv LANG LC_*
+        Subsystem sftp /usr/lib/openssh/sftp-server
+    setup.sh: |
+        #!/bin/bash
+        set -e
+        apt-get update && apt-get install -y \
+          openssh-server \
+          sudo \
+          curl \
+          git \
+          wget \
+          python3 \
+          python3-pip \
+          python3-venv && rm -rf /var/lib/apt/lists/*
+
+        # Install .NET 10
+        curl -fsSL https://packages.microsoft.com/config/ubuntu/24.04/packages-microsoft-prod.deb \
+          -o /tmp/packages-microsoft-prod.deb
+        dpkg -i /tmp/packages-microsoft-prod.deb
+        rm /tmp/packages-microsoft-prod.deb
+        apt-get update && apt-get install -y dotnet-sdk-10.0 && rm -rf /var/lib/apt/lists/*
+
+        # Make dotnet available system-wide
+        echo 'export DOTNET_ROOT=/usr/share/dotnet' > /etc/profile.d/dotnet.sh
+        echo 'export PATH=$PATH:/usr/share/dotnet' >> /etc/profile.d/dotnet.sh
+        chmod +x /etc/profile.d/dotnet.sh
+        ln -sf /usr/share/dotnet/dotnet /usr/local/bin/dotnet
+
+        useradd -m -s /bin/bash dev || true
+        usermod -aG sudo dev
+        echo "dev:password" | chpasswd
+        mkdir -p /home/dev/.ssh /var/run/sshd
+
+        # System-wide JDK path
+        echo 'export JAVA_HOME=/opt/java/openjdk' >> /etc/environment
+        echo 'export PATH=/opt/java/openjdk/bin:$PATH' >> /etc/environment
+        echo 'export DOTNET_ROOT=/usr/share/dotnet' >> /etc/environment
+        echo 'export JAVA_HOME=/opt/java/openjdk' > /etc/profile.d/jdk.sh
+        echo 'export PATH=/opt/java/openjdk/bin:$PATH' >> /etc/profile.d/jdk.sh
+        chmod +x /etc/profile.d/jdk.sh
+        echo 'export JAVA_HOME=/opt/java/openjdk' >> /home/dev/.bashrc
+        echo 'export PATH=/opt/java/openjdk/bin:$PATH' >> /home/dev/.bashrc
+        echo 'export DOTNET_ROOT=/usr/share/dotnet' >> /home/dev/.bashrc
+        echo 'export JAVA_HOME=/opt/java/openjdk' >> /home/dev/.bash_profile
+        echo 'export PATH=/opt/java/openjdk/bin:$PATH' >> /home/dev/.bash_profile
+        echo 'export DOTNET_ROOT=/usr/share/dotnet' >> /home/dev/.bash_profile
+
+        # Copy sshd_config
+        cp /etc/jdk-setup/sshd_config /etc/ssh/sshd_config
+
+        if [ -n "$DEV_SSH_PUBLIC_KEY" ]; then
+          echo "$DEV_SSH_PUBLIC_KEY" > /home/dev/.ssh/authorized_keys
+        fi
+        chmod 700 /home/dev/.ssh
+        chmod 600 /home/dev/.ssh/authorized_keys
+        chown -R dev:dev /home/dev/.ssh
+        chown -R dev:dev /home/dev
+        exec /usr/sbin/sshd -D
+---
+apiVersion: v1
+kind: Pod
+metadata:
+    name: jdk
+    labels:
+        app: jdk
+spec:
+    restartPolicy: Always
+    containers:
+        - name: jdk
+          image: docker.io/library/eclipse-temurin:25-jdk-noble
+          command: ["/bin/bash", "/etc/jdk-setup/setup.sh"]
+          env:
+              - name: DEV_SSH_PUBLIC_KEY
+                value: "${DEV_SSH_PUBLIC_KEY}"
+          ports:
+              - containerPort: 22
+                hostPort: 4422
+          volumeMounts:
+              - mountPath: /home/dev/projects
+                name: jdk-workspace
+              - mountPath: /etc/jdk-setup
+                name: jdk-ssh-config
+    volumes:
+        - name: jdk-workspace
+          hostPath:
+              path: ${PERSISTANT_PATH}/jdk-remote/projects
+              type: DirectoryOrCreate
+        - name: jdk-ssh-config
+          configMap:
+              name: jdk-ssh-config
+              defaultMode: 0755

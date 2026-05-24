@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: go2rtc
+  labels:
+    app: go2rtc
+spec:
+  restartPolicy: Always
+  containers:
+    - name: go2rtc
+      image: docker.io/alexxit/go2rtc:latest
+      ports:
+        - containerPort: 1984
+          hostPort: 1984
+        - containerPort: 8554
+          hostPort: 8554
+        - containerPort: 8555
+          hostPort: 8555
+          protocol: UDP
+      volumeMounts:
+        - name: config
+          mountPath: /config
+  volumes:
+    - name: config
+      hostPath:
+        path: ${PERSISTANT_PATH}/go2rtc/config
+        type: DirectoryOrCreate

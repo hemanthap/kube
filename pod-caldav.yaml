@@ -1,0 +1,70 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: caldav
+  labels:
+    app: caldav
+spec:
+  restartPolicy: Always
+  containers:
+    - name: baikal
+      image: docker.io/ckulka/baikal:nginx
+      env:
+        - name: BAIKAL_DB_DRIVER
+          value: "pgsql"
+        - name: BAIKAL_DB_HOST
+          value: "192.168.68.50"
+        - name: BAIKAL_DB_PORT
+          value: "5432"
+        - name: BAIKAL_DB_NAME
+          value: "baikal"
+        - name: BAIKAL_DB_USER
+          value: "${POSTGRES_USER}"
+        - name: BAIKAL_DB_PASSWORD
+          value: "${POSTGRES_PASSWORD}"
+      ports:
+        - containerPort: 9300
+      volumeMounts:
+        - mountPath: /var/www/baikal/config
+          name: baikal-config
+    - name: agendav
+      image: ghcr.io/nagimov/agendav-docker:latest
+      ports:
+        - containerPort: 9301
+      env:
+        - name: AGENDAV_SERVER_NAME
+          value: "agendav.home"
+        - name: AGENDAV_TITLE
+          value: "Calendar"
+        - name: AGENDAV_FOOTER
+          value: ""
+        - name: AGENDAV_CALDAV_SERVER
+          value: "http://127.0.0.1:9300/dav.php"
+        - name: AGENDAV_CALDAV_PUBLIC_URL
+          value: "http://baikal.home"
+        - name: AGENDAV_TIMEZONE
+          value: "America/New_York"
+        - name: AGENDAV_LANG
+          value: "en"
+        - name: AGENDAV_LOG_DIR
+          value: "/tmp/"
+        - name: AGENDAV_WEEKSTART
+          value: "1"
+        - name: AGENDAV_DB_DRIVER
+          value: "pgsql"
+        - name: AGENDAV_DB_HOST
+          value: "192.168.68.50"
+        - name: AGENDAV_DB_PORT
+          value: "5432"
+        - name: AGENDAV_DB_NAME
+          value: "agendav"
+        - name: AGENDAV_DB_USER
+          value: "${POSTGRES_USER}"
+        - name: AGENDAV_DB_PASSWORD
+          value: "${POSTGRES_PASSWORD}"
+  volumes:
+    - name: baikal-config
+      hostPath:
+        path: ${PERSISTANT_PATH}/baikal/config
+        type: DirectoryOrCreate

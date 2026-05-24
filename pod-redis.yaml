@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: redis
+  labels:
+    app: redis
+spec:
+  restartPolicy: Always
+  containers:
+    
+    - name: redis
+      image: docker.io/library/redis:7-alpine
+      ports:
+        - containerPort: 6379
+          hostPort: 6379
+      args:
+        - "redis-server"
+        - "--databases"
+        - "16"
+        - "--maxmemory"
+        - "512mb"
+        - "--maxmemory-policy"
+        - "allkeys-lru"
+        - "--appendonly"
+        - "yes"
+        - "--appendfsync"
+        - "everysec"
+      volumeMounts:
+        - mountPath: /data
+          name: redis-data
+          
+    - name: redisinsight
+      image: docker.io/redis/redisinsight:latest
+      ports:
+        - containerPort: 5540
+          hostPort: 6380
+      env:
+        - name: RI_APP_PORT
+          value: "5540"
+      envFrom:
+        - secretRef:
+            name: app-secrets
+    
+    - name: redis-exporter
+      image: oliver006/redis_exporter:latest
+      ports:
+        - containerPort: 9121
+          hostPort: 9121
+      env:
+        - name: REDIS_ADDR
+          value: "localhost:6379"
+      envFrom:
+        - secretRef:
+            name: app-secrets
+  volumes:
+    - name: redis-data
+      hostPath:
+        path: ${PERSISTANT_PATH}/redis
+        type: DirectoryOrCreate

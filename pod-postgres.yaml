@@ -1,0 +1,140 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-initdb
+data:
+  01-immich.sh: |
+    #!/bin/bash
+    set -e
+    psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "postgres" <<EOSQL
+    CREATE DATABASE immich OWNER admin;
+    GRANT ALL PRIVILEGES ON DATABASE immich TO admin;
+    EOSQL
+  02-owncloud.sh: |
+    #!/bin/bash
+    set -e
+    psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "postgres" <<EOSQL
+    CREATE DATABASE owncloud OWNER admin;
+    GRANT ALL PRIVILEGES ON DATABASE owncloud TO admin;
+    EOSQL
+  03-memos.sh: |
+    #!/bin/bash
+    set -e
+    psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "postgres" <<EOSQL
+    CREATE DATABASE memos OWNER admin;
+    GRANT ALL PRIVILEGES ON DATABASE memos TO admin;
+    EOSQL
+  04-baikal.sh: |
+    #!/bin/bash
+    set -e
+    psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "postgres" <<EOSQL
+    CREATE DATABASE baikal OWNER admin;
+    GRANT ALL PRIVILEGES ON DATABASE baikal TO admin;
+    EOSQL
+  05-agendav.sh: |
+    #!/bin/bash
+    set -e
+    psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "postgres" <<EOSQL
+    CREATE DATABASE agendav OWNER admin;
+    GRANT ALL PRIVILEGES ON DATABASE agendav TO admin;
+    EOSQL
+  06-linkding.sh: |
+    #!/bin/bash
+    set -e
+    psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "postgres" <<EOSQL
+    CREATE DATABASE linkding OWNER admin;
+    GRANT ALL PRIVILEGES ON DATABASE linkding TO admin;
+    EOSQL
+  07-freshrss.sh: |
+    #!/bin/bash
+    set -e
+    psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "postgres" <<EOSQL
+    CREATE DATABASE freshrss OWNER admin;
+    GRANT ALL PRIVILEGES ON DATABASE freshrss TO admin;
+    EOSQL
+  08-n8n.sh: |
+    #!/bin/bash
+    set -e
+    psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "postgres" <<EOSQL
+    CREATE DATABASE n8n OWNER admin;
+    GRANT ALL PRIVILEGES ON DATABASE n8n TO admin;
+    EOSQL
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: postgres
+  labels:
+    app: postgres
+spec:
+  restartPolicy: Always
+  containers:
+    
+    - name: postgres
+      image: docker.io/tensorchord/pgvecto-rs:pg14-v0.3.0
+      env:
+        - name: POSTGRES_DB
+          value: "postgres"
+        - name: PGDATA
+          value: "/var/lib/postgresql/data"
+        - name: POSTGRES_USER
+          value: "${POSTGRES_USER}"
+        - name: POSTGRES_PASSWORD
+          value: "${POSTGRES_PASSWORD}"
+      ports:
+        - containerPort: 5432
+          hostPort: 5432
+      args:
+        - "postgres"
+        - "-c"
+        - "shared_preload_libraries=vectors.so"
+        - "-c"
+        - "search_path=\"$user\", public, vectors"
+        - "-c"
+        - "logging_collector=on"
+        - "-c"
+        - "max_wal_size=2GB"
+        - "-c"
+        - "shared_buffers=512MB"
+        - "-c"
+        - "wal_compression=on"
+      volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: pgdata
+        - mountPath: /docker-entrypoint-initdb.d
+          name: pg-initdb
+          
+    - name: pgadmin
+      image: dpage/pgadmin4:latest
+      ports:
+        - containerPort: 80
+          hostPort: 5433
+      env:
+        - name: PGADMIN_DEFAULT_EMAIL
+          value: "${PGADMIN_DEFAULT_EMAIL}"
+        - name: PGADMIN_DEFAULT_PASSWORD
+          value: "${PGADMIN_DEFAULT_PASSWORD}"
+        - name: PGADMIN_SETUP_EMAIL
+          value: "${PGADMIN_SETUP_EMAIL}"
+        - name: PGADMIN_SETUP_PASSWORD
+          value: "${PGADMIN_SETUP_PASSWORD}"
+        - name: PGADMIN_CONFIG_SERVER_MODE
+          value: "False"
+    
+    - name: postgres-exporter
+      image: prometheuscommunity/postgres-exporter:latest
+      ports:
+        - containerPort: 9187
+          hostPort: 9187
+      env:
+        - name: DATA_SOURCE_NAME
+          value: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@127.0.0.1:5432/postgres?sslmode=disable"
+  volumes:
+    - name: pgdata
+      hostPath:
+        path: ${PERSISTANT_PATH}/postgres
+        type: DirectoryOrCreate
+    - name: pg-initdb
+      configMap:
+        name: postgres-initdb
+        defaultMode: 0755

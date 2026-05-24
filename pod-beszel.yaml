@@ -1,0 +1,68 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secrets
+type: Opaque
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: beszel
+spec:
+  restartPolicy: Always
+  containers:
+    
+    - name: beszel-hub
+      image: henrygd/beszel
+      ports:
+        - containerPort: 8090
+          hostPort: 8090
+      env:
+        - name: METRICS_ENABLED
+          value: "true"
+      volumeMounts:
+        - mountPath: /beszel_data
+          name: beszel-data
+    
+    - name: beszel-agent
+      image: henrygd/beszel-agent
+      securityContext:
+        privileged: true
+        seLinuxOptions:
+          type: spc_t
+      env:
+        - name: LISTEN
+          value: "45876"
+        - name: DOCKER_HOST
+          value: "unix:///run/k3s/containerd/containerd.sock"
+        - name: LOG_LEVEL
+          value: "debug"
+        - name: KEY
+          value: "${BESZEL_KEY}"
+      envFrom:
+        - secretRef:
+            name: app-secrets
+      ports:
+        - containerPort: 45876
+          hostPort: 45876
+      volumeMounts:
+        - mountPath: /run/k3s/containerd/containerd.sock
+          name: docker-socket
+        - mountPath: /host
+          name: host-root
+          readOnly: true
+  
+  volumes:
+    - name: beszel-data
+      hostPath:
+        path: ${PERSISTANT_PATH}/beszel/data
+        type: DirectoryOrCreate
+    - name: docker-socket
+      hostPath:
+        path: /run/k3s/containerd/containerd.sock
+        type: Socket
+    - name: host-root
+      hostPath:
+        path: /
+        type: Directory
