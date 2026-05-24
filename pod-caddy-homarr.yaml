@@ -60,7 +60,7 @@ data:
     http://filebrowser.home {
       reverse_proxy 127.0.0.1:7000
     }
-    http://beszel.home {
+    http://headlamp.home {
       reverse_proxy 127.0.0.1:8090
     }
     http://dozzle.home {
