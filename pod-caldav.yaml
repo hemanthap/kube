@@ -24,14 +24,16 @@ spec:
         - name: BAIKAL_DB_PASSWORD
           value: "${POSTGRES_PASSWORD}"
       ports:
-        - containerPort: 9300
+        - containerPort: 80
+          hostPort: 9300
       volumeMounts:
         - mountPath: /var/www/baikal/config
           name: baikal-config
     - name: agendav
       image: ghcr.io/nagimov/agendav-docker:latest
       ports:
-        - containerPort: 9301
+        - containerPort: 8080
+          hostPort: 9301
       env:
         - name: AGENDAV_SERVER_NAME
           value: "agendav.home"
@@ -40,7 +42,7 @@ spec:
         - name: AGENDAV_FOOTER
           value: ""
         - name: AGENDAV_CALDAV_SERVER
-          value: "http://127.0.0.1:9300/dav.php"
+          value: "http://127.0.0.1:80/dav.php"
         - name: AGENDAV_CALDAV_PUBLIC_URL
           value: "http://baikal.home"
         - name: AGENDAV_TIMEZONE
