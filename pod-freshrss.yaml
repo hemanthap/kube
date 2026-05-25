@@ -10,6 +10,16 @@ spec:
   containers:
     - name: freshrss
       image: docker.io/freshrss/freshrss:latest
+      lifecycle:
+        postStart:
+          exec:
+            command:
+              - /bin/sh
+              - -c
+              - >-
+                if [ -f /var/www/FreshRSS/data/config.php ]; then
+                  sed -i -E "s/'host'\s*=>\s*'(lab\.home|host\.containers\.internal|postgres)'/'host' => '${POSTGRES_HOST}'/g" /var/www/FreshRSS/data/config.php;
+                fi
       ports:
         - containerPort: 80
           hostPort: 9500
@@ -21,9 +31,9 @@ spec:
         - name: DB_TYPE
           value: "pgsql"
         - name: DB_HOST
-          value: "host.containers.internal"
+          value: "${POSTGRES_HOST}"
         - name: DB_PORT
-          value: "5432"
+          value: "${POSTGRES_PORT}"
         - name: DB_NAME
           value: "freshrss"
         - name: DB_USER
