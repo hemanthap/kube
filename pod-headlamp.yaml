@@ -19,6 +19,31 @@ subjects:
     namespace: default
 ---
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: headlamp-kubeconfig
+  namespace: default
+data:
+  config: |
+    apiVersion: v1
+    kind: Config
+    clusters:
+      - name: in-cluster
+        cluster:
+          server: https://kubernetes.default.svc
+          certificate-authority: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    users:
+      - name: headlamp-sa
+        user:
+          tokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+    contexts:
+      - name: main
+        context:
+          cluster: in-cluster
+          user: headlamp-sa
+    current-context: main
+---
+apiVersion: v1
 kind: Pod
 metadata:
   name: headlamp
@@ -28,10 +53,18 @@ metadata:
 spec:
   serviceAccountName: headlamp
   restartPolicy: Always
+  volumes:
+    - name: headlamp-kubeconfig
+      configMap:
+        name: headlamp-kubeconfig
   containers:
     - name: headlamp
       image: ghcr.io/headlamp-k8s/headlamp:latest
-      args: ["-in-cluster"]
+      args: ["-kubeconfig", "/home/headlamp/.config/Headlamp/kubeconfigs/config"]
+      volumeMounts:
+        - name: headlamp-kubeconfig
+          mountPath: /home/headlamp/.config/Headlamp/kubeconfigs/config
+          subPath: config
       ports:
         - containerPort: 4466
           hostPort: 8090
