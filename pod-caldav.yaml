@@ -2,71 +2,102 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: caldav
+  name: baikal
   labels:
-    app: caldav
+    app: baikal
 spec:
+  securityContext:
+    runAsNonRoot: false
   restartPolicy: Always
   containers:
     - name: baikal
       image: docker.io/ckulka/baikal:nginx
+      lifecycle:
+        postStart:
+          exec:
+            command:
+              - /bin/sh
+              - -c
+              - >-
+                sed -i 's/dav_auth_type: Digest/dav_auth_type: Basic/' /var/www/baikal/config/baikal.yaml
+      ports:
+        - containerPort: 80
+          hostPort: 9300
+          protocol: TCP
       env:
         - name: BAIKAL_DB_DRIVER
           value: "pgsql"
         - name: BAIKAL_DB_HOST
-          value: "192.168.68.50"
+          value: "${POSTGRES_HOST}"
         - name: BAIKAL_DB_PORT
-          value: "5432"
+          value: "${POSTGRES_PORT}"
         - name: BAIKAL_DB_NAME
-          value: "baikal"
+          value: "${BAIKAL_DB_NAME}"
         - name: BAIKAL_DB_USER
           value: "${POSTGRES_USER}"
         - name: BAIKAL_DB_PASSWORD
           value: "${POSTGRES_PASSWORD}"
-      ports:
-        - containerPort: 80
-          hostPort: 9300
-      volumeMounts:
-        - mountPath: /var/www/baikal/config
-          name: baikal-config
-    - name: agendav
-      image: ghcr.io/nagimov/agendav-docker:latest
-      ports:
-        - containerPort: 8080
-          hostPort: 9301
-      env:
-        - name: AGENDAV_SERVER_NAME
-          value: "agendav.home"
-        - name: AGENDAV_TITLE
-          value: "Calendar"
-        - name: AGENDAV_FOOTER
-          value: ""
-        - name: AGENDAV_CALDAV_SERVER
-          value: "http://127.0.0.1:80/dav.php"
-        - name: AGENDAV_CALDAV_PUBLIC_URL
-          value: "http://baikal.home"
-        - name: AGENDAV_TIMEZONE
-          value: "America/New_York"
-        - name: AGENDAV_LANG
-          value: "en"
-        - name: AGENDAV_LOG_DIR
-          value: "/tmp/"
-        - name: AGENDAV_WEEKSTART
-          value: "1"
-        - name: AGENDAV_DB_DRIVER
-          value: "pgsql"
-        - name: AGENDAV_DB_HOST
-          value: "192.168.68.50"
-        - name: AGENDAV_DB_PORT
-          value: "5432"
-        - name: AGENDAV_DB_NAME
-          value: "agendav"
         - name: AGENDAV_DB_USER
           value: "${POSTGRES_USER}"
         - name: AGENDAV_DB_PASSWORD
           value: "${POSTGRES_PASSWORD}"
+      volumeMounts:
+        - mountPath: /var/www/baikal/config
+          name: baikal-config
   volumes:
     - name: baikal-config
       hostPath:
         path: ${PERSISTANT_PATH}/baikal/config
         type: DirectoryOrCreate
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: agendav
+  labels:
+    app: agendav
+spec:
+  restartPolicy: Always
+  containers:
+    - name: agendav
+      image: ghcr.io/nagimov/agendav-docker:latest
+      ports:
+        - containerPort: 8080
+          hostPort: 9301
+          protocol: TCP
+      lifecycle:
+        postStart:
+          exec:
+            command:
+              - /bin/sh
+              - -c
+              - >-
+                sed -i "s/caldav.authmethod'] = 'digest'/caldav.authmethod'] = 'basic'/" /var/www/agendav/web/config/settings.php && awk 'NR==46{d=sprintf("%c",36); print "        if (false === " d "result || (false !== " d "err && ((" d "err[\"warning_count\"] ?? 0) > 0 || (" d "err[\"error_count\"] ?? 0) > 0))) {"; next}1' /var/www/agendav/web/src/DateHelper.php > /tmp/DateHelper.php && mv /tmp/DateHelper.php /var/www/agendav/web/src/DateHelper.php && sed -i '2640s/continue;/continue 2;/' /var/www/agendav/web/vendor/doctrine/orm/lib/Doctrine/ORM/UnitOfWork.php
+      env:
+        - name: AGENDAV_SERVER_NAME
+          value: "${AGENDAV_SERVER_NAME}"
+        - name: AGENDAV_TITLE
+          value: "${AGENDAV_TITLE}"
+        - name: AGENDAV_FOOTER
+          value: "${AGENDAV_FOOTER}"
+        - name: AGENDAV_CALDAV_SERVER
+          value: "${AGENDAV_CALDAV_SERVER}"
+        - name: AGENDAV_CALDAV_PUBLIC_URL
+          value: "${AGENDAV_CALDAV_PUBLIC_URL}"
+        - name: AGENDAV_TIMEZONE
+          value: "${AGENDAV_TIMEZONE}"
+        - name: AGENDAV_LANG
+          value: "${AGENDAV_LANG}"
+        - name: AGENDAV_LOG_DIR
+          value: "${AGENDAV_LOG_DIR}"
+        - name: AGENDAV_WEEKSTART
+          value: "${AGENDAV_WEEKSTART}"
+        - name: AGENDAV_DB_DRIVER
+          value: "pgsql"
+        - name: AGENDAV_DB_HOST
+          value: "${POSTGRES_HOST}"
+        - name: AGENDAV_DB_PORT
+          value: "${POSTGRES_PORT}"
+        - name: AGENDAV_DB_NAME
+          value: "${AGENDAV_DB_NAME}"
