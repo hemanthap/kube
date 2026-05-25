@@ -26,6 +26,8 @@ spec:
           value: "America/New_York"
         - name: N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS
           value: "false"
+        - name: N8N_USER_MANAGEMENT_DISABLED
+          value: "true"
         - name: DB_TYPE
           value: "postgresdb"
         - name: DB_POSTGRESDB_HOST
@@ -34,8 +36,6 @@ spec:
           value: "5432"
         - name: DB_POSTGRESDB_DATABASE
           value: "n8n"
-        - name: N8N_RUNNERS_MODE
-          value: "internal"
         - name: N8N_DIAGNOSTICS_ENABLED
           value: "false"
         - name: N8N_VERSION_NOTIFICATIONS_ENABLED
