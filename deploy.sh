@@ -27,7 +27,7 @@ fi
 delete_pods() {
     local tmp_file="$1"
     local pod_names
-    pod_names=$(kubectl get -f "$tmp_file" --no-headers -o custom-columns=":metadata.name,:kind" 2>/dev/null | awk '$2=="Pod" {print $1}')
+    pod_names=$(kubectl get -f "$tmp_file" --no-headers -o custom-columns=":metadata.name,:kind" 2>/dev/null | awk '$2=="Pod" {print $1}') || true
     for pod in $pod_names; do
         if kubectl get pod "$pod" &>/dev/null; then
             echo "Deleting pod $pod"

@@ -6,12 +6,13 @@ metadata:
     app: ntfy
 spec:
   restartPolicy: Always
+  hostNetwork: true
   containers:
     - name: ntfy
       image: docker.io/binwiederhier/ntfy:latest
-      args: ["serve"]
+      args: ["serve", "--listen-http", ":2586"]
       ports:
-        - containerPort: 80
+        - containerPort: 2586
           hostPort: 2586
       env:
         - name: TZ
