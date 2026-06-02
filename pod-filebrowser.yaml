@@ -39,10 +39,10 @@ spec:
           memory: "512Mi"
           cpu: "500m"
       volumeMounts:
-        - name: data
-          mountPath: /srv/data
+        - name: admin
+          mountPath: /srv/admin
         - name: dockerdata
-          mountPath: ${PERSISTANT_PATH}
+          mountPath: /srv/dockerdata
         - name: config
           mountPath: /config
         - name: database
@@ -52,13 +52,13 @@ spec:
         - name: uploads
           mountPath: /srv/.uploads
   volumes:
-    - name: data
+    - name: admin
       hostPath:
         path: /home/admin
         type: Directory
     - name: dockerdata
       hostPath:
-        path: ${PERSISTANT_PATH}
+        path: /srv/dockerdata
         type: Directory
     - name: config
       hostPath:
