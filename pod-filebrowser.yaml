@@ -41,7 +41,6 @@ spec:
       volumeMounts:
         - name: data
           mountPath: /srv/data
-          readOnly: true
         - name: dockerdata
           mountPath: ${PERSISTANT_PATH}
         - name: config
