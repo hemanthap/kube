@@ -9,66 +9,51 @@ data:
         PasswordAuthentication yes
         PubkeyAuthentication yes
         AuthorizedKeysFile .ssh/authorized_keys
-        UsePAM yes
         X11Forwarding no
         PrintMotd no
         AcceptEnv LANG LC_*
         Subsystem sftp /usr/lib/openssh/sftp-server
     setup.sh: |
-        #!/bin/bash
-        set -e
-        apt-get update && apt-get install -y \
-          openssh-server \
-          sudo \
-          curl \
-          git \
-          wget \
-          python3 \
-          python3-pip \
-          python3-venv && rm -rf /var/lib/apt/lists/*
+        #!/bin/sh
+        set -ex
 
-        # Install .NET 10
-        curl -fsSL https://packages.microsoft.com/config/ubuntu/24.04/packages-microsoft-prod.deb \
-          -o /tmp/packages-microsoft-prod.deb
-        dpkg -i /tmp/packages-microsoft-prod.deb
-        rm /tmp/packages-microsoft-prod.deb
-        apt-get update && apt-get install -y dotnet-sdk-10.0 && rm -rf /var/lib/apt/lists/*
+        # Install packages
+        apk add --no-cache \
+          openjdk25 openssh openssh-client sudo curl git wget \
+          python3 py3-pip ca-certificates icu-libs libssl3 zlib \
+          coreutils bash dotnet8-sdk
 
-        # Make dotnet available system-wide
-        echo 'export DOTNET_ROOT=/usr/share/dotnet' > /etc/profile.d/dotnet.sh
-        echo 'export PATH=$PATH:/usr/share/dotnet' >> /etc/profile.d/dotnet.sh
-        chmod +x /etc/profile.d/dotnet.sh
-        ln -sf /usr/share/dotnet/dotnet /usr/local/bin/dotnet
+        # Install Maven
+        MVN_VERSION=3.9.8
+        curl -fsSL "https://archive.apache.org/dist/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.tar.gz" \
+          -o /tmp/maven.tar.gz
+        tar -xzf /tmp/maven.tar.gz -C /opt && ln -sf /opt/apache-maven-${MVN_VERSION} /opt/maven && rm /tmp/maven.tar.gz
 
-        useradd -m -s /bin/bash dev || true
-        usermod -aG sudo dev
-        echo "dev:password" | chpasswd
-        mkdir -p /home/dev/.ssh /var/run/sshd
+        # Setup environment
+        JAVA_HOME=$(find /usr/lib/jvm -name "java-*-openjdk" -type d | head -1)
+        mkdir -p /etc/profile.d
+        echo "export JAVA_HOME=$JAVA_HOME" > /etc/profile.d/devenv.sh
+        echo "export MAVEN_HOME=/opt/maven" >> /etc/profile.d/devenv.sh
+        echo "export DOTNET_ROOT=/usr/lib/dotnet" >> /etc/profile.d/devenv.sh
+        echo 'export PATH=$JAVA_HOME/bin:/opt/maven/bin:$DOTNET_ROOT:$PATH' >> /etc/profile.d/devenv.sh
+        chmod +x /etc/profile.d/devenv.sh
 
-        # System-wide JDK path
-        echo 'export JAVA_HOME=/opt/java/openjdk' >> /etc/environment
-        echo 'export PATH=/opt/java/openjdk/bin:$PATH' >> /etc/environment
-        echo 'export DOTNET_ROOT=/usr/share/dotnet' >> /etc/environment
-        echo 'export JAVA_HOME=/opt/java/openjdk' > /etc/profile.d/jdk.sh
-        echo 'export PATH=/opt/java/openjdk/bin:$PATH' >> /etc/profile.d/jdk.sh
-        chmod +x /etc/profile.d/jdk.sh
-        echo 'export JAVA_HOME=/opt/java/openjdk' >> /home/dev/.bashrc
-        echo 'export PATH=/opt/java/openjdk/bin:$PATH' >> /home/dev/.bashrc
-        echo 'export DOTNET_ROOT=/usr/share/dotnet' >> /home/dev/.bashrc
-        echo 'export JAVA_HOME=/opt/java/openjdk' >> /home/dev/.bash_profile
-        echo 'export PATH=/opt/java/openjdk/bin:$PATH' >> /home/dev/.bash_profile
-        echo 'export DOTNET_ROOT=/usr/share/dotnet' >> /home/dev/.bash_profile
+        # Create dev user
+        addgroup dev || true
+        adduser -D -G dev -s /bin/sh -h /home/dev dev || true
+        mkdir -p /home/dev
+        echo "dev:Dev123!" | chpasswd  # Set password for dev user
 
-        # Copy sshd_config
-        cp /etc/jdk-setup/sshd_config /etc/ssh/sshd_config
+        # Setup SSH
+        mkdir -p /home/dev/.ssh /run/sshd
+        ssh-keygen -A  # Generate SSH host keys
+        [ -f /etc/jdk-setup/sshd_config ] && cp /etc/jdk-setup/sshd_config /etc/ssh/sshd_config
+        [ -n "$DEV_SSH_PUBLIC_KEY" ] && echo "$DEV_SSH_PUBLIC_KEY" > /home/dev/.ssh/authorized_keys
+        chmod 700 /home/dev/.ssh 2>/dev/null || true
+        [ -f /home/dev/.ssh/authorized_keys ] && chmod 600 /home/dev/.ssh/authorized_keys
+        chown -R dev:dev /home/dev 2>/dev/null || true
 
-        if [ -n "$DEV_SSH_PUBLIC_KEY" ]; then
-          echo "$DEV_SSH_PUBLIC_KEY" > /home/dev/.ssh/authorized_keys
-        fi
-        chmod 700 /home/dev/.ssh
-        chmod 600 /home/dev/.ssh/authorized_keys
-        chown -R dev:dev /home/dev/.ssh
-        chown -R dev:dev /home/dev
+        # Start SSH
         exec /usr/sbin/sshd -D
 ---
 apiVersion: v1
@@ -81,8 +66,8 @@ spec:
     restartPolicy: Always
     containers:
         - name: jdk
-          image: docker.io/library/eclipse-temurin:25-jdk-noble
-          command: ["/bin/bash", "/etc/jdk-setup/setup.sh"]
+          image: alpine:latest
+          command: ["/bin/sh", "/etc/jdk-setup/setup.sh"]
           env:
               - name: DEV_SSH_PUBLIC_KEY
                 value: "${DEV_SSH_PUBLIC_KEY}"
@@ -97,7 +82,7 @@ spec:
     volumes:
         - name: jdk-workspace
           hostPath:
-              path: ${PERSISTANT_PATH}/jdk-remote/projects
+              path: /var/lib/kube/jdk/projects
               type: DirectoryOrCreate
         - name: jdk-ssh-config
           configMap:
