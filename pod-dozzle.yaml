@@ -35,6 +35,17 @@ metadata:
   name: dozzle
 spec:
   serviceAccountName: dozzle
+  initContainers:
+    - name: wait-for-api
+      image: busybox:latest
+      command:
+        - sh
+        - -c
+        - |
+          until nc -z 10.43.0.1 443; do
+            echo "Waiting for Kubernetes API...";
+            sleep 2;
+          done
   containers:
     - name: dozzle
       image: amir20/dozzle:latest
