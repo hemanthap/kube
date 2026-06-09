@@ -23,17 +23,28 @@ data:
           python3 py3-pip ca-certificates icu-libs libssl3 zlib \
           coreutils bash dotnet8-sdk
 
-        # Install Maven
-        MVN_VERSION=3.9.8
-        curl -fsSL "https://archive.apache.org/dist/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.tar.gz" \
-          -o /tmp/maven.tar.gz
-        tar -xzf /tmp/maven.tar.gz -C /opt && ln -sf /opt/apache-maven-${MVN_VERSION} /opt/maven && rm /tmp/maven.tar.gz
+        # Install Maven. Prefer Alpine package to avoid long external archive downloads.
+        if ! apk add --no-cache maven; then
+          MVN_VERSION=3.9.8
+          curl -fL --connect-timeout 15 --max-time 180 \
+            "https://archive.apache.org/dist/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.tar.gz" \
+            -o /tmp/maven.tar.gz
+          tar -xzf /tmp/maven.tar.gz -C /opt
+          ln -sf /opt/apache-maven-${MVN_VERSION} /opt/maven
+          rm -f /tmp/maven.tar.gz
+        fi
 
         # Setup environment
         JAVA_HOME=$(find /usr/lib/jvm -name "java-*-openjdk" -type d | head -1)
         mkdir -p /etc/profile.d
         echo "export JAVA_HOME=$JAVA_HOME" > /etc/profile.d/devenv.sh
-        echo "export MAVEN_HOME=/opt/maven" >> /etc/profile.d/devenv.sh
+        if command -v mvn >/dev/null 2>&1; then
+          MVN_BIN=$(command -v mvn)
+          MVN_DIR=$(dirname "$(dirname "$MVN_BIN")")
+          echo "export MAVEN_HOME=$MVN_DIR" >> /etc/profile.d/devenv.sh
+        else
+          echo "export MAVEN_HOME=/opt/maven" >> /etc/profile.d/devenv.sh
+        fi
         echo "export DOTNET_ROOT=/usr/lib/dotnet" >> /etc/profile.d/devenv.sh
         echo 'export PATH=$JAVA_HOME/bin:/opt/maven/bin:$DOTNET_ROOT:$PATH' >> /etc/profile.d/devenv.sh
         chmod +x /etc/profile.d/devenv.sh
@@ -52,6 +63,25 @@ data:
         chmod 700 /home/dev/.ssh 2>/dev/null || true
         [ -f /home/dev/.ssh/authorized_keys ] && chmod 600 /home/dev/.ssh/authorized_keys
         chown -R dev:dev /home/dev 2>/dev/null || true
+
+        # Install VS Code remote extensions if a compatible CLI is available.
+        install_exts() {
+          cli="$1"
+          su dev -c "$cli --install-extension vscjava.vscode-java-pack --force" || true
+          su dev -c "$cli --install-extension vscjava.vscode-maven --force" || true
+          su dev -c "$cli --install-extension ms-python.python --force" || true
+          su dev -c "$cli --install-extension ms-dotnettools.csharp --force" || true
+          su dev -c "$cli --install-extension ms-dotnettools.vscode-dotnet-runtime --force" || true
+        }
+
+        if command -v code >/dev/null 2>&1; then
+          install_exts "code"
+        fi
+
+        for cli in /home/dev/.vscode-server/bin/*/bin/code-server; do
+          [ -x "$cli" ] || continue
+          install_exts "$cli"
+        done
 
         # Start SSH
         exec /usr/sbin/sshd -D
@@ -82,7 +112,7 @@ spec:
     volumes:
         - name: jdk-workspace
           hostPath:
-              path: /var/lib/kube/jdk/projects
+              path: ${PERSISTANT_PATH}/jdk
               type: DirectoryOrCreate
         - name: jdk-ssh-config
           configMap:
