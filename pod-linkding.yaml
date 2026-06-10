@@ -4,7 +4,6 @@ metadata:
   name: linkding
 spec:
   restartPolicy: Always
-  hostNetwork: true
   containers:
     - name: linkding
       image: docker.io/sissbruecker/linkding:latest
@@ -15,7 +14,7 @@ spec:
         - name: LD_DB_ENGINE
           value: "postgres"
         - name: LD_DB_HOST
-          value: "127.0.0.1"
+          value: "${HOST_IP}"
         - name: LD_DB_PORT
           value: "5432"
         - name: LD_DB_DATABASE
@@ -32,3 +31,17 @@ spec:
           value: "9100"
       ports:
         - containerPort: 9100
+          hostPort: 9100
+      resources:
+        requests:
+          memory: "128Mi"
+          cpu: "100m"
+        limits:
+          memory: "512Mi"
+          cpu: "500m"
+      volumeMounts:
+        - mountPath: /tmp
+          name: tmp
+  volumes:
+    - name: tmp
+      emptyDir: {}

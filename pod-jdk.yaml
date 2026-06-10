@@ -109,10 +109,17 @@ spec:
                 name: jdk-workspace
               - mountPath: /etc/jdk-setup
                 name: jdk-ssh-config
+          resources:
+              requests:
+                  memory: "256Mi"
+                  cpu: "200m"
+              limits:
+                  memory: "2Gi"
+                  cpu: "2000m"
     volumes:
         - name: jdk-workspace
           hostPath:
-              path: ${PERSISTANT_PATH}/jdk
+              path: ${PERSISTENT_PATH}/jdk
               type: DirectoryOrCreate
         - name: jdk-ssh-config
           configMap:

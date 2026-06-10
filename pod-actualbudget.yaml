@@ -17,12 +17,20 @@ spec:
       volumeMounts:
         - mountPath: /data
           name: data
-      securityContext:
-        seLinuxOptions:
-          level: s0
-          type: unconfined_t
+        - mountPath: /tmp
+          name: tmp
+      resources:
+        requests:
+          memory: "128Mi"
+          cpu: "100m"
+        limits:
+          memory: "512Mi"
+          cpu: "500m"
+
   volumes:
     - name: data
       hostPath:
-        path: ${PERSISTANT_PATH}/actualbudget
+        path: ${PERSISTENT_PATH}/actualbudget
         type: DirectoryOrCreate
+    - name: tmp
+      emptyDir: {}

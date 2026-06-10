@@ -12,3 +12,16 @@ spec:
       ports:
         - containerPort: 8080
           hostPort: 5500
+      resources:
+        requests:
+          memory: "128Mi"
+          cpu: "100m"
+        limits:
+          memory: "512Mi"
+          cpu: "500m"
+      volumeMounts:
+        - mountPath: /tmp
+          name: tmp
+  volumes:
+    - name: tmp
+      emptyDir: {}

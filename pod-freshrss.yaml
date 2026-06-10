@@ -45,12 +45,20 @@ spec:
           name: freshrss-data
         - mountPath: /var/www/FreshRSS/extensions
           name: freshrss-extensions
+      resources:
+        requests:
+          memory: "128Mi"
+          cpu: "100m"
+        limits:
+          memory: "512Mi"
+          cpu: "500m"
+
   volumes:
     - name: freshrss-data
       hostPath:
-        path: ${PERSISTANT_PATH}/freshrss/data
+        path: ${PERSISTENT_PATH}/freshrss/data
         type: DirectoryOrCreate
     - name: freshrss-extensions
       hostPath:
-        path: ${PERSISTANT_PATH}/freshrss/extensions
+        path: ${PERSISTENT_PATH}/freshrss/extensions
         type: DirectoryOrCreate

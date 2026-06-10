@@ -53,7 +53,7 @@ spec:
   volumes:
     - name: ha-config
       hostPath:
-        path: ${PERSISTANT_PATH}/homeassistant
+        path: ${PERSISTENT_PATH}/homeassistant
         type: DirectoryOrCreate
 
     - name: ha-configuration

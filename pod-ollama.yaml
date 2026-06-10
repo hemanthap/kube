@@ -9,7 +9,7 @@ spec:
   restartPolicy: Always
   containers:
     - name: ollama
-      image: docker.io/ollama/ollama:latest
+      image: docker.io/ollama/ollama:0.5.4
       ports:
         - containerPort: 11434
           hostPort: 11434
@@ -37,9 +37,26 @@ spec:
         limits:
           memory: "10Gi"
           cpu: "6000m"
+      livenessProbe:
+        httpGet:
+          path: /api/version
+          port: 11434
+        initialDelaySeconds: 20
+        periodSeconds: 30
+      readinessProbe:
+        httpGet:
+          path: /api/version
+          port: 11434
+        initialDelaySeconds: 10
+        periodSeconds: 10
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: false
+        capabilities:
+          drop: ["ALL"]
 
     - name: open-webui
-      image: ghcr.io/open-webui/open-webui:main
+      image: ghcr.io/open-webui/open-webui:0.5.6
       ports:
         - containerPort: 8080
           hostPort: 11435
@@ -61,13 +78,30 @@ spec:
         limits:
           memory: "1Gi"
           cpu: "1000m"
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 8080
+        initialDelaySeconds: 30
+        periodSeconds: 30
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 8080
+        initialDelaySeconds: 20
+        periodSeconds: 10
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: false
+        capabilities:
+          drop: ["ALL"]
 
   volumes:
     - name: ollama-data
       hostPath:
-        path: ${PERSISTANT_PATH}/ollama
+        path: ${PERSISTENT_PATH}/ollama
         type: DirectoryOrCreate
     - name: webui-data
       hostPath:
-        path: ${PERSISTANT_PATH}/open-webui
+        path: ${PERSISTENT_PATH}/open-webui
         type: DirectoryOrCreate

@@ -9,7 +9,7 @@ spec:
   hostNetwork: true
   containers:
     - name: ntfy
-      image: docker.io/binwiederhier/ntfy:latest
+      image: docker.io/binwiederhier/ntfy:v2.11.0
       args: ["serve", "--listen-http", ":2586"]
       ports:
         - containerPort: 2586
@@ -22,12 +22,41 @@ spec:
           name: ntfy-cache
         - mountPath: /etc/ntfy
           name: ntfy-config
+          readOnly: true
+        - mountPath: /tmp
+          name: tmp
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "50m"
+        limits:
+          memory: "256Mi"
+          cpu: "500m"
+      livenessProbe:
+        httpGet:
+          path: /v1/health
+          port: 2586
+        initialDelaySeconds: 10
+        periodSeconds: 30
+      readinessProbe:
+        httpGet:
+          path: /v1/health
+          port: 2586
+        initialDelaySeconds: 5
+        periodSeconds: 10
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop: ["ALL"]
   volumes:
     - name: ntfy-cache
       hostPath:
-        path: ${PERSISTANT_PATH}/ntfy/cache
+        path: ${PERSISTENT_PATH}/ntfy/cache
         type: DirectoryOrCreate
     - name: ntfy-config
       hostPath:
-        path: ${PERSISTANT_PATH}/ntfy/config
+        path: ${PERSISTENT_PATH}/ntfy/config
         type: DirectoryOrCreate
+    - name: tmp
+      emptyDir: {}

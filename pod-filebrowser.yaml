@@ -38,6 +38,18 @@ spec:
         limits:
           memory: "512Mi"
           cpu: "500m"
+      livenessProbe:
+        httpGet:
+          path: /health
+          port: 8080
+        initialDelaySeconds: 10
+        periodSeconds: 30
+      readinessProbe:
+        httpGet:
+          path: /health
+          port: 8080
+        initialDelaySeconds: 5
+        periodSeconds: 10
       volumeMounts:
         - name: admin
           mountPath: /srv/admin
@@ -62,7 +74,7 @@ spec:
         type: Directory
     - name: config
       hostPath:
-        path: ${PERSISTANT_PATH}/filebrowser/config
+        path: ${PERSISTENT_PATH}/filebrowser/config
         type: DirectoryOrCreate
     - name: database
       hostPath:

@@ -28,6 +28,14 @@ spec:
       volumeMounts:
         - mountPath: /data
           name: redis-data
+      resources:
+        requests:
+          memory: "128Mi"
+          cpu: "100m"
+        limits:
+          memory: "640Mi"
+          cpu: "500m"
+
           
     - name: redisinsight
       image: docker.io/redis/redisinsight:latest
@@ -40,9 +48,17 @@ spec:
       envFrom:
         - secretRef:
             name: app-secrets
+      resources:
+        requests:
+          memory: "128Mi"
+          cpu: "100m"
+        limits:
+          memory: "512Mi"
+          cpu: "500m"
+
     
     - name: redis-exporter
-      image: oliver006/redis_exporter:latest
+      image: oliver006/redis_exporter:v1.67.0
       ports:
         - containerPort: 9121
           hostPort: 9121
@@ -52,8 +68,16 @@ spec:
       envFrom:
         - secretRef:
             name: app-secrets
+      resources:
+        requests:
+          memory: "32Mi"
+          cpu: "50m"
+        limits:
+          memory: "128Mi"
+          cpu: "200m"
+
   volumes:
     - name: redis-data
       hostPath:
-        path: ${PERSISTANT_PATH}/redis
+        path: ${PERSISTENT_PATH}/redis
         type: DirectoryOrCreate

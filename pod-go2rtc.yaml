@@ -8,7 +8,7 @@ spec:
   restartPolicy: Always
   containers:
     - name: go2rtc
-      image: docker.io/alexxit/go2rtc:latest
+      image: docker.io/alexxit/go2rtc:1.9.4
       ports:
         - containerPort: 1984
           hostPort: 1984
@@ -20,8 +20,36 @@ spec:
       volumeMounts:
         - name: config
           mountPath: /config
+        - name: tmp
+          mountPath: /tmp
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "100m"
+        limits:
+          memory: "256Mi"
+          cpu: "500m"
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 1984
+        initialDelaySeconds: 10
+        periodSeconds: 30
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 1984
+        initialDelaySeconds: 5
+        periodSeconds: 10
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop: ["ALL"]
   volumes:
     - name: config
       hostPath:
-        path: ${PERSISTANT_PATH}/go2rtc/config
+        path: ${PERSISTENT_PATH}/go2rtc/config
         type: DirectoryOrCreate
+    - name: tmp
+      emptyDir: {}

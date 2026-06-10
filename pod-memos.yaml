@@ -4,7 +4,6 @@ metadata:
   name: memos
 spec:
   restartPolicy: Always
-  hostNetwork: true
   containers:
     - name: memos
       image: docker.io/neosmemo/memos:stable
@@ -19,6 +18,20 @@ spec:
         - name: MEMOS_PORT
           value: "5400"
         - name: MEMOS_DSN
-          value: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@127.0.0.1:5432/memos?sslmode=disable"
+          value: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${HOST_IP}:5432/memos?sslmode=disable"
       ports:
         - containerPort: 5400
+          hostPort: 5400
+      resources:
+        requests:
+          memory: "128Mi"
+          cpu: "100m"
+        limits:
+          memory: "512Mi"
+          cpu: "500m"
+      volumeMounts:
+        - mountPath: /tmp
+          name: tmp
+  volumes:
+    - name: tmp
+      emptyDir: {}

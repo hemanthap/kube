@@ -25,12 +25,25 @@ spec:
           mountPath: /data
         - name: music
           mountPath: /music
+          readOnly: true
+        - name: tmp
+          mountPath: /tmp
+      resources:
+        requests:
+          memory: "128Mi"
+          cpu: "100m"
+        limits:
+          memory: "512Mi"
+          cpu: "1000m"
+
   volumes:
     - name: data
       hostPath:
-        path: ${PERSISTANT_PATH}/navidrome/data
+        path: ${PERSISTENT_PATH}/navidrome/data
         type: DirectoryOrCreate
     - name: music
       hostPath:
-        path: ${PERSISTANT_PATH}/navidrome/music
+        path: ${PERSISTENT_PATH}/navidrome/music
         type: DirectoryOrCreate
+    - name: tmp
+      emptyDir: {}

@@ -10,7 +10,7 @@ spec:
       type: spc_t
   containers:
     - name: tailscale
-      image: tailscale/tailscale:latest
+      image: tailscale/tailscale:v1.80.3
       command:
         - /bin/sh
         - -c
@@ -44,7 +44,7 @@ spec:
           done
 
           # Use host IP instead of localhost for userspace networking
-          /usr/local/bin/tailscale funnel --https=443 --bg http://192.168.68.50:5678
+          /usr/local/bin/tailscale funnel --https=443 --bg http://${HOST_IP}:5678
 
           wait $DAEMON_PID
       securityContext:
@@ -62,10 +62,17 @@ spec:
           mountPath: /var/lib/tailscale
         - name: run
           mountPath: /var/run/tailscale
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "50m"
+        limits:
+          memory: "256Mi"
+          cpu: "500m"
   volumes:
     - name: data
       hostPath:
-        path: ${PERSISTANT_PATH}/tailscale
+        path: ${PERSISTENT_PATH}/tailscale
         type: DirectoryOrCreate
     - name: run
       emptyDir: {}

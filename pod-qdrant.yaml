@@ -33,6 +33,8 @@ spec:
       volumeMounts:
         - mountPath: /qdrant/storage
           name: qdrant-data
+        - mountPath: /tmp
+          name: tmp
       resources:
         requests:
           memory: "512Mi"
@@ -40,8 +42,11 @@ spec:
         limits:
           memory: "2Gi"
           cpu: "1000m"
+
   volumes:
     - name: qdrant-data
       hostPath:
-        path: ${PERSISTANT_PATH}/qdrant
+        path: ${PERSISTENT_PATH}/qdrant
         type: DirectoryOrCreate
+    - name: tmp
+      emptyDir: {}

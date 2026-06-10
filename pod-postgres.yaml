@@ -103,6 +103,14 @@ spec:
           name: pgdata
         - mountPath: /docker-entrypoint-initdb.d
           name: pg-initdb
+      resources:
+        requests:
+          memory: "512Mi"
+          cpu: "250m"
+        limits:
+          memory: "2Gi"
+          cpu: "2000m"
+
           
     - name: pgadmin
       image: dpage/pgadmin4:latest
@@ -120,11 +128,19 @@ spec:
           value: "${PGADMIN_SETUP_PASSWORD}"
         - name: PGADMIN_CONFIG_SERVER_MODE
           value: "False"
+      resources:
+        requests:
+          memory: "128Mi"
+          cpu: "100m"
+        limits:
+          memory: "512Mi"
+          cpu: "500m"
+
     
   volumes:
     - name: pgdata
       hostPath:
-        path: ${PERSISTANT_PATH}/postgres
+        path: ${PERSISTENT_PATH}/postgres
         type: DirectoryOrCreate
     - name: pg-initdb
       configMap:

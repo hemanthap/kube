@@ -37,7 +37,7 @@ spec:
   serviceAccountName: dozzle
   initContainers:
     - name: wait-for-api
-      image: busybox:latest
+      image: busybox:1.37.0
       command:
         - sh
         - -c
@@ -58,3 +58,16 @@ spec:
           value: "info"
         - name: DOZZLE_MODE
           value: "k8s"
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "50m"
+        limits:
+          memory: "256Mi"
+          cpu: "500m"
+      volumeMounts:
+        - mountPath: /tmp
+          name: tmp
+  volumes:
+    - name: tmp
+      emptyDir: {}

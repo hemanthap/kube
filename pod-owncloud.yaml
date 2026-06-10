@@ -18,7 +18,7 @@ spec:
         - name: OWNCLOUD_DB_TYPE
           value: "pgsql"
         - name: OWNCLOUD_DB_HOST
-          value: "192.168.68.50"          # ← shared postgres pod
+          value: "${HOST_IP}"          # ← shared postgres pod
         - name: OWNCLOUD_DB_PORT
           value: "5432"
         - name: OWNCLOUD_DB_NAME
@@ -26,7 +26,7 @@ spec:
         - name: OWNCLOUD_REDIS_ENABLED
           value: "true"
         - name: OWNCLOUD_REDIS_HOST
-          value: "192.168.68.50"             # ← shared redis pod
+          value: "${HOST_IP}"             # ← shared redis pod
         - name: OWNCLOUD_REDIS_PORT
           value: "6379"
         - name: OWNCLOUD_REDIS_DB
@@ -50,10 +50,18 @@ spec:
         - mountPath: /etc/localtime
           name: localtime
           readOnly: true
+      resources:
+        requests:
+          memory: "256Mi"
+          cpu: "200m"
+        limits:
+          memory: "1Gi"
+          cpu: "1000m"
+
   volumes:
     - name: owncloud-data
       hostPath:
-        path: ${PERSISTANT_PATH}/owncloud
+        path: ${PERSISTENT_PATH}/owncloud
         type: DirectoryOrCreate
     - name: localtime
       hostPath:

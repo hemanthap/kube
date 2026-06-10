@@ -28,13 +28,16 @@ spec:
       volumeMounts:
         - mountPath: /etc/dns
           name: technitium-data
-      securityContext:
-        capabilities:
-          add:
-            - NET_ADMIN
-            - NET_BIND_SERVICE
+      resources:
+        requests:
+          memory: "128Mi"
+          cpu: "100m"
+        limits:
+          memory: "512Mi"
+          cpu: "500m"
+
   volumes:
     - name: technitium-data
       hostPath:
-        path: ${PERSISTANT_PATH}/technitium/data
+        path: ${PERSISTENT_PATH}/technitium/data
         type: DirectoryOrCreate
