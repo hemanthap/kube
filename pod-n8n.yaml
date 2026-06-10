@@ -10,7 +10,14 @@ spec:
   hostNetwork: true
   containers:
     - name: n8n
-      image: docker.io/n8nio/n8n:2.14.1
+      image: docker.io/n8nio/n8n:latest
+      resources:
+        requests:
+          memory: "256Mi"
+          cpu: "200m"
+        limits:
+          memory: "1Gi"
+          cpu: "1000m"
       env:
         - name: N8N_HOST
           value: "lab-home.tail359ab2.ts.net"
@@ -31,7 +38,7 @@ spec:
         - name: DB_TYPE
           value: "postgresdb"
         - name: DB_POSTGRESDB_HOST
-          value: "127.0.0.1"
+          value: "${HOST_IP}"
         - name: DB_POSTGRESDB_PORT
           value: "5432"
         - name: DB_POSTGRESDB_DATABASE
@@ -65,7 +72,7 @@ spec:
   volumes:
     - name: n8n-data
       hostPath:
-        path: ${PERSISTANT_PATH}/n8n
+        path: ${PERSISTENT_PATH}/n8n
         type: Directory
     - name: localtime
       hostPath:
