@@ -145,17 +145,19 @@ spec:
                   memory: "256Mi"
                   cpu: "500m"
           livenessProbe:
-              httpGet:
-                  path: /
-                  port: 80
+              tcpSocket:
+                port: 80
               initialDelaySeconds: 10
               periodSeconds: 30
+              timeoutSeconds: 5
+              failureThreshold: 3
           readinessProbe:
-              httpGet:
-                  path: /
-                  port: 80
+              tcpSocket:
+                port: 80
               initialDelaySeconds: 5
               periodSeconds: 10
+              timeoutSeconds: 5
+              failureThreshold: 6
           securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: false
@@ -190,17 +192,26 @@ spec:
                   memory: "512Mi"
                   cpu: "500m"
           livenessProbe:
-              httpGet:
-                  path: /
-                  port: 7575
-              initialDelaySeconds: 20
+              tcpSocket:
+                port: 7575
+              initialDelaySeconds: 30
               periodSeconds: 30
+              timeoutSeconds: 5
+              failureThreshold: 3
           readinessProbe:
-              httpGet:
-                  path: /
-                  port: 7575
-              initialDelaySeconds: 10
+              tcpSocket:
+                port: 7575
+              initialDelaySeconds: 15
               periodSeconds: 10
+              timeoutSeconds: 5
+              failureThreshold: 6
+          startupProbe:
+              tcpSocket:
+                port: 7575
+              # Allow up to 5 minutes for cold starts before liveness kicks in.
+              periodSeconds: 10
+              timeoutSeconds: 5
+              failureThreshold: 30
           securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: false
