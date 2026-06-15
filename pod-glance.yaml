@@ -132,7 +132,7 @@ data:
                         url: http://bentopdf.home
                         icon: di:bentopdf
                       - title: AgenDAV Calendar
-                        url: http://agendav.home/admin
+                        url: http://agendav.home
                         icon: mdi:calendar
                       - title: Linkding
                         url: http://linkding.home
