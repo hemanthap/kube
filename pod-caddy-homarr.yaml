@@ -69,6 +69,9 @@ data:
     http://homeassistant.home {
       reverse_proxy 127.0.0.1:8123
     }
+    http://glance.home {
+      reverse_proxy 127.0.0.1:8585
+    }
     http://linkding.home {
       reverse_proxy 127.0.0.1:9100
     }

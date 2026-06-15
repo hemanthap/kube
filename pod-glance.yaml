@@ -1,0 +1,194 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: glance-config
+data:
+  glance.yml: |
+    server:
+      host: 0.0.0.0
+      port: 8080
+
+    branding:
+      app-name: Home-Lab Dashboard
+      hide-footer: false
+
+    theme:
+      background-color: 0 0 0
+      primary-color: 0 0 75
+      positive-color: 140 45 45
+      negative-color: 0 65 60
+      contrast-multiplier: 1.1
+      disable-picker: true
+
+    pages:
+      - name: Home-Lab
+        width: wide
+        show-mobile-header: true
+        columns:
+          - size: small
+            widgets:
+              - type: weather
+                title: Basking Ridge
+                location: Basking Ridge, New Jersey, United States
+                units: imperial
+                hour-format: 12h
+
+              - type: calendar
+                first-day-of-week: monday
+
+              - type: clock
+                hour-format: 12h
+                timezones:
+                  - timezone: Asia/Kolkata
+                    label: Bangalore
+                  - timezone: America/New_York
+                    label: Basking Ridge
+
+          - size: full
+            widgets:
+              - type: bookmarks
+                groups:
+                  - title: Home & Security
+                    links:
+                      - title: Camera Living Room
+                        url: http://go2rtc.home/stream.html?src=tapo_camera_livingroom
+                        icon: di:go2rtc
+                      - title: Camera Basement
+                        url: http://go2rtc.home/stream.html?src=tapo_camera_basement
+                        icon: di:go2rtc
+
+                  - title: Media
+                    links:
+                      - title: Navidrome
+                        url: http://navidrome.home
+                        icon: di:navidrome
+                      - title: Immich
+                        url: http://immich.home/photos
+                        icon: di:immich
+                      - title: ownCloud
+                        url: http://owncloud.home
+                        icon: di:owncloud
+                      - title: FreshRSS
+                        url: http://freshrss.home
+                        icon: di:freshrss
+
+                  - title: Productivity
+                    links:
+                      - title: Memos
+                        url: http://memos.home
+                        icon: di:memos
+                      - title: BentoPDF
+                        url: http://bentopdf.home
+                        icon: di:bentopdf
+                      - title: AgenDAV Calendar
+                        url: http://agendav.home/admin
+                        icon: mdi:calendar
+                      - title: Linkding
+                        url: http://linkding.home
+                        icon: di:linkding
+                      - title: Actual Budget
+                        url: http://budget.home
+                        icon: di:actual-budget
+
+                  - title: Development
+                    links:
+                      - title: Qdrant
+                        url: http://qdrant.home/dashboard
+                        icon: di:qdrant
+                      - title: Ollama UI
+                        url: http://192.168.68.101:3000
+                        icon: di:ollama
+                      - title: n8n
+                        url: http://n8n.home
+                        icon: di:n8n
+                      - title: pgAdmin
+                        url: http://pgadmin.home
+                        icon: di:pgadmin
+                      - title: RedisInsight
+                        url: http://redisinsight.home
+                        icon: di:redis
+
+                  - title: Admin & Network Tools
+                    links:
+                      - title: Server Dashboard
+                        url: http://lab.home:9090
+                        icon: mdi:server
+                      - title: Headlamp
+                        url: http://headlamp.home
+                        icon: di:headlamp
+                      - title: Dozzle
+                        url: http://dozzle.home
+                        icon: di:dozzle
+                      - title: Baikal Admin
+                        url: http://baikal.home/admin
+                        icon: di:baikal
+                      - title: Technitium DNS
+                        url: http://technitium.home
+                        icon: di:technitium
+                      - title: Rclone
+                        url: http://rclone.home
+                        icon: di:rclone
+                      - title: File Browser
+                        url: http://filebrowser.home
+                        icon: di:filebrowser
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: glance
+spec:
+  restartPolicy: Always
+  containers:
+    - name: glance
+      image: glanceapp/glance:latest
+      imagePullPolicy: IfNotPresent
+      ports:
+        - name: http
+          containerPort: 8080
+          hostPort: 8585
+          protocol: TCP
+      resources:
+        requests:
+          memory: "128Mi"
+          cpu: "100m"
+        limits:
+          memory: "512Mi"
+          cpu: "500m"
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 8080
+        initialDelaySeconds: 10
+        periodSeconds: 30
+        timeoutSeconds: 5
+        failureThreshold: 3
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 8080
+        initialDelaySeconds: 5
+        periodSeconds: 10
+        timeoutSeconds: 5
+        failureThreshold: 6
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: false
+      volumeMounts:
+        - name: glance-config
+          mountPath: /app/config/glance.yml
+          subPath: glance.yml
+        - name: glance-data
+          mountPath: /app/data
+        - name: tmp
+          mountPath: /tmp
+  volumes:
+    - name: glance-config
+      configMap:
+        name: glance-config
+    - name: glance-data
+      hostPath:
+        path: ${PERSISTENT_PATH}/glance
+        type: DirectoryOrCreate
+    - name: tmp
+      emptyDir: {}
