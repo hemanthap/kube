@@ -116,6 +116,9 @@ data:
                       - title: Server Dashboard
                         url: http://lab.home:9090
                         icon: mdi:server
+                      - title: Tailscale
+                        url: http://tailscale.home
+                        icon: mdi:vpn
                       - title: ntfy
                         url: http://ntfy.home
                         icon: mdi:bell-ring-outline
@@ -257,6 +260,9 @@ data:
                   - title: Server Dashboard
                     url: http://lab.home:9090
                     icon: mdi:server
+                  - title: Tailscale
+                    url: http://tailscale.home
+                    icon: mdi:vpn
                   - title: ntfy
                     url: http://ntfy.home
                     icon: mdi:bell-ring-outline

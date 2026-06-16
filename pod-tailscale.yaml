@@ -69,6 +69,35 @@ spec:
         limits:
           memory: "256Mi"
           cpu: "500m"
+    - name: tailscale-web
+      image: tailscale/tailscale:v1.80.3
+      command:
+        - /bin/sh
+        - -c
+        - |
+          until [ -S /var/run/tailscale/tailscaled.sock ]; do
+            echo "Waiting for tailscaled socket..."
+            sleep 1
+          done
+
+          /usr/local/bin/tailscale \
+            --socket=/var/run/tailscale/tailscaled.sock \
+            web --listen=0.0.0.0:8088
+      ports:
+        - containerPort: 8088
+          hostPort: 8088
+      volumeMounts:
+        - name: run
+          mountPath: /var/run/tailscale
+      resources:
+        requests:
+          memory: "32Mi"
+          cpu: "20m"
+        limits:
+          memory: "128Mi"
+          cpu: "200m"
+      securityContext:
+        allowPrivilegeEscalation: false
   volumes:
     - name: data
       hostPath:

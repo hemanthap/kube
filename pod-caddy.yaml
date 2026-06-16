@@ -63,6 +63,9 @@ data:
     http://homarr.home {
       reverse_proxy 127.0.0.1:7575
     }
+    http://tailscale.home {
+      reverse_proxy 127.0.0.1:8088
+    }
     http://headlamp.home {
       reverse_proxy 127.0.0.1:8090
     }
