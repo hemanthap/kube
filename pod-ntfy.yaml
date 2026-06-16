@@ -10,7 +10,7 @@ spec:
   containers:
     - name: ntfy
       image: docker.io/binwiederhier/ntfy:v2.11.0
-      args: ["serve", "--listen-http", ":2586"]
+      args: ["serve", "--config", "/etc/ntfy/server.yml", "--listen-http", ":2586"]
       ports:
         - containerPort: 2586
           hostPort: 2586

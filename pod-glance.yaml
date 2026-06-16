@@ -116,6 +116,9 @@ data:
                       - title: Server Dashboard
                         url: http://lab.home:9090
                         icon: mdi:server
+                      - title: ntfy
+                        url: http://ntfy.home
+                        icon: mdi:bell-ring-outline
                       - title: Headlamp
                         url: http://headlamp.home
                         icon: di:headlamp
@@ -254,6 +257,9 @@ data:
                   - title: Server Dashboard
                     url: http://lab.home:9090
                     icon: mdi:server
+                  - title: ntfy
+                    url: http://ntfy.home
+                    icon: mdi:bell-ring-outline
                   - title: Headlamp
                     url: http://headlamp.home
                     icon: di:headlamp
