@@ -27,6 +27,10 @@ data:
         columns:
           - size: small
             widgets: &left-sidebar-widgets
+              - type: search
+                search-engine: duckduckgo
+                autofocus: true
+
               - type: weather
                 title: Basking Ridge
                 location: Basking Ridge, New Jersey, United States
@@ -48,62 +52,24 @@ data:
             widgets:
               - type: bookmarks
                 groups:
-                  - title: Quick Access
+                  - title: Security
                     links:
-                      - title: Homarr
-                        url: http://lab.home
-                        icon: di:homarr
-                      - title: Glance
-                        url: http://glance.home
-                        icon: mdi:view-dashboard
-                      - title: File Browser
-                        url: http://filebrowser.home
-                        icon: di:filebrowser
-                      - title: Headlamp
-                        url: http://headlamp.home
-                        icon: di:headlamp
-                      - title: Technitium DNS
-                        url: http://technitium.home
-                        icon: di:technitium
-
-      - name: Home Security
-        width: wide
-        show-mobile-header: true
-        columns:
-          - size: small
-            widgets: *left-sidebar-widgets
-
-          - size: full
-            widgets:
-              - type: bookmarks
-                groups:
-                  - title: Home Security
-                    links:
-                      - title: Camera Living Room
+                      - title: go2rtc
+                        url: http://go2rtc.home
+                        icon: di:go2rtc
+                      - title: Camera — Living Room
                         url: http://go2rtc.home/stream.html?src=tapo_camera_livingroom
                         icon: di:go2rtc
-                      - title: Camera Basement
+                      - title: Camera — Basement
                         url: http://go2rtc.home/stream.html?src=tapo_camera_basement
                         icon: di:go2rtc
-
-      - name: Media
-        width: wide
-        show-mobile-header: true
-        columns:
-          - size: small
-            widgets: *left-sidebar-widgets
-
-          - size: full
-            widgets:
-              - type: bookmarks
-                groups:
                   - title: Media
                     links:
                       - title: Navidrome
                         url: http://navidrome.home
                         icon: di:navidrome
                       - title: Immich
-                        url: http://immich.home/photos
+                        url: http://immich.home
                         icon: di:immich
                       - title: ownCloud
                         url: http://owncloud.home
@@ -111,18 +77,6 @@ data:
                       - title: FreshRSS
                         url: http://freshrss.home
                         icon: di:freshrss
-
-      - name: Productivity
-        width: wide
-        show-mobile-header: true
-        columns:
-          - size: small
-            widgets: *left-sidebar-widgets
-
-          - size: full
-            widgets:
-              - type: bookmarks
-                groups:
                   - title: Productivity
                     links:
                       - title: Memos
@@ -140,48 +94,24 @@ data:
                       - title: Actual Budget
                         url: http://budget.home
                         icon: di:actual-budget
-
-      - name: Development
-        width: wide
-        show-mobile-header: true
-        columns:
-          - size: small
-            widgets: *left-sidebar-widgets
-
-          - size: full
-            widgets:
-              - type: bookmarks
-                groups:
                   - title: Development
                     links:
-                      - title: Qdrant
-                        url: http://qdrant.home/dashboard
-                        icon: di:qdrant
-                      - title: Ollama UI
-                        url: http://192.168.68.101:3000
-                        icon: di:ollama
                       - title: n8n
                         url: http://n8n.home
                         icon: di:n8n
+                      - title: Ollama
+                        url: http://192.168.68.101:3000
+                        icon: di:ollama
                       - title: pgAdmin
                         url: http://pgadmin.home
                         icon: di:pgadmin
                       - title: RedisInsight
                         url: http://redisinsight.home
                         icon: di:redis
-
-      - name: Admin & Network
-        width: wide
-        show-mobile-header: true
-        columns:
-          - size: small
-            widgets: *left-sidebar-widgets
-
-          - size: full
-            widgets:
-              - type: bookmarks
-                groups:
-                  - title: Admin & Network Tools
+                      - title: Qdrant
+                        url: http://qdrant.home/dashboard
+                        icon: di:qdrant
+                  - title: Admin & Network
                     links:
                       - title: Server Dashboard
                         url: http://lab.home:9090
@@ -192,18 +122,151 @@ data:
                       - title: Dozzle
                         url: http://dozzle.home
                         icon: di:dozzle
-                      - title: Baikal Admin
-                        url: http://baikal.home/admin
-                        icon: di:baikal
-                      - title: Technitium DNS
-                        url: http://technitium.home
-                        icon: di:technitium
-                      - title: Rclone
-                        url: http://rclone.home
-                        icon: di:rclone
                       - title: File Browser
                         url: http://filebrowser.home
                         icon: di:filebrowser
+                      - title: Technitium DNS
+                        url: http://technitium.home
+                        icon: di:technitium
+
+      - name: Home Security
+        width: wide
+        show-mobile-header: true
+        columns:
+          - size: small
+            widgets: *left-sidebar-widgets
+
+          - size: full
+            widgets:
+              - type: monitor
+                cache: 1m
+                title: Security & Cameras
+                sites:
+                  - title: go2rtc
+                    url: http://go2rtc.home
+                    icon: di:go2rtc
+                  - title: Camera — Living Room
+                    url: http://go2rtc.home/stream.html?src=tapo_camera_livingroom
+                    check-url: http://go2rtc.home
+                    icon: di:go2rtc
+                  - title: Camera — Basement
+                    url: http://go2rtc.home/stream.html?src=tapo_camera_basement
+                    check-url: http://go2rtc.home
+                    icon: di:go2rtc
+
+      - name: Media
+        width: wide
+        show-mobile-header: true
+        columns:
+          - size: small
+            widgets: *left-sidebar-widgets
+
+          - size: full
+            widgets:
+              - type: monitor
+                cache: 1m
+                title: Media Services
+                sites:
+                  - title: Navidrome
+                    url: http://navidrome.home
+                    icon: di:navidrome
+                  - title: Immich
+                    url: http://immich.home
+                    icon: di:immich
+                  - title: ownCloud
+                    url: http://owncloud.home
+                    icon: di:owncloud
+                  - title: FreshRSS
+                    url: http://freshrss.home
+                    icon: di:freshrss
+
+      - name: Productivity
+        width: wide
+        show-mobile-header: true
+        columns:
+          - size: small
+            widgets: *left-sidebar-widgets
+
+          - size: full
+            widgets:
+              - type: monitor
+                cache: 1m
+                title: Productivity Tools
+                sites:
+                  - title: Memos
+                    url: http://memos.home
+                    icon: di:memos
+                  - title: BentoPDF
+                    url: http://bentopdf.home
+                    icon: di:bentopdf
+                  - title: AgenDAV Calendar
+                    url: http://agendav.home
+                    icon: mdi:calendar
+                  - title: Linkding
+                    url: http://linkding.home
+                    icon: di:linkding
+                  - title: Actual Budget
+                    url: http://budget.home
+                    icon: di:actual-budget
+
+      - name: Development
+        width: wide
+        show-mobile-header: true
+        columns:
+          - size: small
+            widgets: *left-sidebar-widgets
+
+          - size: full
+            widgets:
+              - type: monitor
+                cache: 1m
+                title: Development Tools
+                sites:
+                  - title: Qdrant Dashboard
+                    url: http://qdrant.home/dashboard
+                    icon: di:qdrant
+                  - title: Ollama UI
+                    url: http://192.168.68.101:3000
+                    icon: di:ollama
+                  - title: n8n
+                    url: http://n8n.home
+                    icon: di:n8n
+                  - title: pgAdmin
+                    url: http://pgadmin.home
+                    icon: di:pgadmin
+                  - title: RedisInsight
+                    url: http://redisinsight.home
+                    icon: di:redis
+
+      - name: Admin & Network
+        width: wide
+        show-mobile-header: true
+        columns:
+          - size: small
+            widgets: *left-sidebar-widgets
+
+          - size: full
+            widgets:
+              - type: monitor
+                cache: 1m
+                title: Admin & Network Tools
+                sites:
+                  - title: Server Dashboard
+                    url: http://lab.home:9090
+                    icon: mdi:server
+                  - title: Headlamp
+                    url: http://headlamp.home
+                    icon: di:headlamp
+                  - title: Dozzle
+                    url: http://dozzle.home
+                    icon: di:dozzle
+                  - title: Baikal Admin
+                    url: http://baikal.home/admin
+                    check-url: http://baikal.home
+                    icon: di:baikal
+                  - title: Technitium DNS
+                    url: http://technitium.home
+                    icon: di:technitium
 
 ---
 apiVersion: v1
@@ -212,6 +275,15 @@ metadata:
   name: glance
 spec:
   restartPolicy: Always
+  dnsPolicy: None
+  dnsConfig:
+    nameservers:
+      - 192.168.68.50
+      - 10.43.0.10
+    searches:
+      - default.svc.cluster.local
+      - svc.cluster.local
+      - cluster.local
   containers:
     - name: glance
       image: glanceapp/glance:latest
