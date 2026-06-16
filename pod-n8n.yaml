@@ -38,7 +38,7 @@ spec:
         - name: DB_TYPE
           value: "postgresdb"
         - name: DB_POSTGRESDB_HOST
-          value: "${HOST_IP}"
+          value: "127.0.0.1"
         - name: DB_POSTGRESDB_PORT
           value: "5432"
         - name: DB_POSTGRESDB_DATABASE
