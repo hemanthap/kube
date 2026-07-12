@@ -31,11 +31,11 @@ data:
                 search-engine: duckduckgo
                 autofocus: true
 
-              - type: weather
-                title: Basking Ridge
-                location: Basking Ridge, New Jersey, United States
-                units: imperial
-                hour-format: 12h
+              # - type: weather
+              #   title: Basking Ridge
+              #   location: Basking Ridge, New Jersey, United States
+              #   units: imperial
+              #   hour-format: 12h
 
               - type: calendar
                 first-day-of-week: monday
