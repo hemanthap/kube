@@ -9,7 +9,7 @@ spec:
   restartPolicy: Always
   containers:
     - name: immich
-      image: ghcr.io/immich-app/immich-server:v2.7.5
+      image: ghcr.io/immich-app/immich-server:release
       env:
         - name: DB_HOSTNAME
           value: "${HOST_IP}"
