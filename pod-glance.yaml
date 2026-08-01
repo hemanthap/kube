@@ -31,12 +31,6 @@ data:
                 search-engine: duckduckgo
                 autofocus: true
 
-              # - type: weather
-              #   title: Basking Ridge
-              #   location: Basking Ridge, New Jersey, United States
-              #   units: imperial
-              #   hour-format: 12h
-
               - type: calendar
                 first-day-of-week: monday
 
@@ -45,14 +39,15 @@ data:
                 timezones:
                   - timezone: Asia/Kolkata
                     label: Bangalore
-                  - timezone: America/New_York
-                    label: Basking Ridge
 
           - size: full
             widgets:
               - type: bookmarks
+                style: cards
                 groups:
-                  - title: Security
+                  - &grp-security
+                    title: Security
+                    color: "0 70 55"
                     links:
                       - title: go2rtc
                         url: http://go2rtc.home
@@ -63,7 +58,9 @@ data:
                       - title: Camera — Basement
                         url: http://go2rtc.home/stream.html?src=tapo_camera_basement
                         icon: di:go2rtc
-                  - title: Media
+                  - &grp-media
+                    title: Media
+                    color: "270 55 65"
                     links:
                       - title: Navidrome
                         url: http://navidrome.home
@@ -77,7 +74,9 @@ data:
                       - title: FreshRSS
                         url: http://freshrss.home
                         icon: di:freshrss
-                  - title: Productivity
+                  - &grp-productivity
+                    title: Productivity
+                    color: "160 55 45"
                     links:
                       - title: Memos
                         url: http://memos.home
@@ -94,7 +93,9 @@ data:
                       - title: Actual Budget
                         url: http://budget.home
                         icon: di:actual-budget
-                  - title: Development
+                  - &grp-development
+                    title: Development
+                    color: "200 70 55"
                     links:
                       - title: n8n
                         url: http://n8n.home
@@ -111,7 +112,13 @@ data:
                       - title: Qdrant
                         url: http://qdrant.home/dashboard
                         icon: di:qdrant
-                  - title: Admin & Network
+                  # Note: unified so this group is identical on every page —
+                  # the old config had "File Browser" here but "Baikal Admin"
+                  # only on the separate Admin & Network page. Now both appear
+                  # everywhere.
+                  - &grp-admin
+                    title: Admin & Network
+                    color: "35 80 55"
                     links:
                       - title: Server Dashboard
                         url: http://lab.home:9090
@@ -131,6 +138,9 @@ data:
                       - title: File Browser
                         url: http://filebrowser.home
                         icon: di:filebrowser
+                      - title: Baikal Admin
+                        url: http://baikal.home/admin
+                        icon: di:baikal
                       - title: Technitium DNS
                         url: http://technitium.home
                         icon: di:technitium
@@ -141,22 +151,12 @@ data:
         columns:
           - size: small
             widgets: *left-sidebar-widgets
-
           - size: full
             widgets:
               - type: bookmarks
+                style: cards
                 groups:
-                  - title: Security & Cameras
-                    links:
-                      - title: go2rtc
-                        url: http://go2rtc.home
-                        icon: di:go2rtc
-                      - title: Camera — Living Room
-                        url: http://go2rtc.home/stream.html?src=tapo_camera_livingroom
-                        icon: di:go2rtc
-                      - title: Camera — Basement
-                        url: http://go2rtc.home/stream.html?src=tapo_camera_basement
-                        icon: di:go2rtc
+                  - *grp-security
 
       - name: Media
         width: wide
@@ -164,25 +164,12 @@ data:
         columns:
           - size: small
             widgets: *left-sidebar-widgets
-
           - size: full
             widgets:
               - type: bookmarks
+                style: cards
                 groups:
-                  - title: Media Services
-                    links:
-                      - title: Navidrome
-                        url: http://navidrome.home
-                        icon: di:navidrome
-                      - title: Immich
-                        url: http://immich.home
-                        icon: di:immich
-                      - title: ownCloud
-                        url: http://owncloud.home
-                        icon: di:owncloud
-                      - title: FreshRSS
-                        url: http://freshrss.home
-                        icon: di:freshrss
+                  - *grp-media
 
       - name: Productivity
         width: wide
@@ -190,28 +177,12 @@ data:
         columns:
           - size: small
             widgets: *left-sidebar-widgets
-
           - size: full
             widgets:
               - type: bookmarks
+                style: cards
                 groups:
-                  - title: Productivity Tools
-                    links:
-                      - title: Memos
-                        url: http://memos.home
-                        icon: di:memos
-                      - title: BentoPDF
-                        url: http://bentopdf.home
-                        icon: di:bentopdf
-                      - title: AgenDAV Calendar
-                        url: http://agendav.home
-                        icon: mdi:calendar
-                      - title: Linkding
-                        url: http://linkding.home
-                        icon: di:linkding
-                      - title: Actual Budget
-                        url: http://budget.home
-                        icon: di:actual-budget
+                  - *grp-productivity
 
       - name: Development
         width: wide
@@ -219,28 +190,20 @@ data:
         columns:
           - size: small
             widgets: *left-sidebar-widgets
-
           - size: full
             widgets:
               - type: bookmarks
+                style: cards
                 groups:
-                  - title: Development Tools
-                    links:
-                      - title: Qdrant Dashboard
-                        url: http://qdrant.home/dashboard
-                        icon: di:qdrant
-                      - title: Ollama UI
-                        url: http://192.168.68.101:3000
-                        icon: di:ollama
-                      - title: n8n
-                        url: http://n8n.home
-                        icon: di:n8n
-                      - title: pgAdmin
-                        url: http://pgadmin.home
-                        icon: di:pgadmin
-                      - title: RedisInsight
-                        url: http://redisinsight.home
-                        icon: di:redis
+                  - *grp-development
+              # CPU / memory / disk / network for the host running these
+              # dev services. Requires hostPath mounts of /proc and /sys
+              # (see the Pod spec below) — remove this widget if you'd
+              # rather not grant that access.
+              - type: server-stats
+                servers:
+                  - type: local
+                    name: lab-server
 
       - name: Admin & Network
         width: wide
@@ -248,34 +211,12 @@ data:
         columns:
           - size: small
             widgets: *left-sidebar-widgets
-
           - size: full
             widgets:
               - type: bookmarks
+                style: cards
                 groups:
-                  - title: Admin & Network Tools
-                    links:
-                      - title: Server Dashboard
-                        url: http://lab.home:9090
-                        icon: mdi:server
-                      - title: Tailscale
-                        url: http://tailscale.home
-                        icon: mdi:vpn
-                      - title: ntfy
-                        url: http://ntfy.home
-                        icon: mdi:bell-ring-outline
-                      - title: Headlamp
-                        url: http://headlamp.home
-                        icon: di:headlamp
-                      - title: Dozzle
-                        url: http://dozzle.home
-                        icon: di:dozzle
-                      - title: Baikal Admin
-                        url: http://baikal.home/admin
-                        icon: di:baikal
-                      - title: Technitium DNS
-                        url: http://technitium.home
-                        icon: di:technitium
+                  - *grp-admin
 
 ---
 apiVersion: v1
@@ -336,6 +277,13 @@ spec:
           mountPath: /app/data
         - name: tmp
           mountPath: /tmp
+        # Only needed if you keep the server-stats widget above.
+        - name: proc
+          mountPath: /host/proc
+          readOnly: true
+        - name: sys
+          mountPath: /host/sys
+          readOnly: true
   volumes:
     - name: glance-config
       configMap:
@@ -346,3 +294,11 @@ spec:
         type: DirectoryOrCreate
     - name: tmp
       emptyDir: {}
+    - name: proc
+      hostPath:
+        path: /proc
+        type: Directory
+    - name: sys
+      hostPath:
+        path: /sys
+        type: Directory
