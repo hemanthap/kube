@@ -49,50 +49,50 @@ data:
                     title: Security
                     color: "0 70 55"
                     links:
-                      - title: go2rtc
-                        url: http://go2rtc.home
+                      - title: Camera — Basement
+                        url: http://go2rtc.home/stream.html?src=tapo_camera_basement
                         icon: di:go2rtc
                       - title: Camera — Living Room
                         url: http://go2rtc.home/stream.html?src=tapo_camera_livingroom
                         icon: di:go2rtc
-                      - title: Camera — Basement
-                        url: http://go2rtc.home/stream.html?src=tapo_camera_basement
+                      - title: go2rtc
+                        url: http://go2rtc.home
                         icon: di:go2rtc
                   - &grp-media
                     title: Media
                     color: "270 55 65"
                     links:
-                      - title: Navidrome
-                        url: http://navidrome.home
-                        icon: di:navidrome
-                      - title: Immich
-                        url: http://immich.home
-                        icon: di:immich
-                      - title: ownCloud
-                        url: http://owncloud.home
-                        icon: di:owncloud
                       - title: FreshRSS
                         url: http://freshrss.home
                         icon: di:freshrss
+                      - title: Immich
+                        url: http://immich.home
+                        icon: di:immich
+                      - title: Navidrome
+                        url: http://navidrome.home
+                        icon: di:navidrome
+                      - title: ownCloud
+                        url: http://owncloud.home
+                        icon: di:owncloud
                   - &grp-productivity
                     title: Productivity
                     color: "160 55 45"
                     links:
-                      - title: Memos
-                        url: http://memos.home
-                        icon: di:memos
-                      - title: BentoPDF
-                        url: http://bentopdf.home
-                        icon: di:bentopdf
-                      - title: AgenDAV Calendar
-                        url: http://agendav.home
-                        icon: mdi:calendar
-                      - title: Linkding
-                        url: http://linkding.home
-                        icon: di:linkding
                       - title: Actual Budget
                         url: http://budget.home
                         icon: di:actual-budget
+                      - title: AgenDAV Calendar
+                        url: http://agendav.home
+                        icon: mdi:calendar
+                      - title: BentoPDF
+                        url: http://bentopdf.home
+                        icon: di:bentopdf
+                      - title: Linkding
+                        url: http://linkding.home
+                        icon: di:linkding
+                      - title: Memos
+                        url: http://memos.home
+                        icon: di:memos
                   - &grp-development
                     title: Development
                     color: "200 70 55"
@@ -106,12 +106,12 @@ data:
                       - title: pgAdmin
                         url: http://pgadmin.home
                         icon: di:pgadmin
-                      - title: RedisInsight
-                        url: http://redisinsight.home
-                        icon: di:redis
                       - title: Qdrant
                         url: http://qdrant.home/dashboard
                         icon: di:qdrant
+                      - title: RedisInsight
+                        url: http://redisinsight.home
+                        icon: di:redis
                   # Note: unified so this group is identical on every page —
                   # the old config had "File Browser" here but "Baikal Admin"
                   # only on the separate Admin & Network page. Now both appear
@@ -120,27 +120,27 @@ data:
                     title: Admin & Network
                     color: "35 80 55"
                     links:
-                      - title: Server Dashboard
-                        url: http://lab.home:9090
-                        icon: mdi:server
-                      - title: Tailscale
-                        url: http://tailscale.home
-                        icon: mdi:vpn
-                      - title: ntfy
-                        url: http://ntfy.home
-                        icon: mdi:bell-ring-outline
-                      - title: Headlamp
-                        url: http://headlamp.home
-                        icon: di:headlamp
+                      - title: Baikal Admin
+                        url: http://baikal.home/admin
+                        icon: di:baikal
                       - title: Dozzle
                         url: http://dozzle.home
                         icon: di:dozzle
                       - title: File Browser
                         url: http://filebrowser.home
                         icon: di:filebrowser
-                      - title: Baikal Admin
-                        url: http://baikal.home/admin
-                        icon: di:baikal
+                      - title: Headlamp
+                        url: http://headlamp.home
+                        icon: di:headlamp
+                      - title: ntfy
+                        url: http://ntfy.home
+                        icon: mdi:bell-ring-outline
+                      - title: Server Dashboard
+                        url: http://lab.home:9090
+                        icon: mdi:server
+                      - title: Tailscale
+                        url: http://tailscale.home
+                        icon: mdi:vpn
                       - title: Technitium DNS
                         url: http://technitium.home
                         icon: di:technitium
