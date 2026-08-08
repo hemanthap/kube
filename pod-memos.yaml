@@ -6,7 +6,7 @@ spec:
   restartPolicy: Always
   containers:
     - name: memos
-      image: docker.io/neosmemo/memos:stable
+      image: ghcr.io/usememos/memos:stable
       imagePullPolicy: IfNotPresent
       env:
         - name: MEMOS_PUBLIC
