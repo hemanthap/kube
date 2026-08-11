@@ -21,8 +21,10 @@ data:
       disable-picker: true
 
     pages:
-      - name: Home
+      - name: Dashboard
+        slug: home
         width: wide
+        hide-desktop-navigation: true
         show-mobile-header: true
         columns:
           - size: small
@@ -145,78 +147,22 @@ data:
                         url: http://technitium.home
                         icon: di:technitium
 
-      - name: Home Security
-        width: wide
-        show-mobile-header: true
-        columns:
-          - size: small
-            widgets: *left-sidebar-widgets
-          - size: full
-            widgets:
-              - type: bookmarks
-                style: cards
-                groups:
-                  - *grp-security
-
-      - name: Media
-        width: wide
-        show-mobile-header: true
-        columns:
-          - size: small
-            widgets: *left-sidebar-widgets
-          - size: full
-            widgets:
-              - type: bookmarks
-                style: cards
-                groups:
-                  - *grp-media
-
-      - name: Productivity
-        width: wide
-        show-mobile-header: true
-        columns:
-          - size: small
-            widgets: *left-sidebar-widgets
-          - size: full
-            widgets:
-              - type: bookmarks
-                style: cards
-                groups:
-                  - *grp-productivity
-
-      - name: Development
-        width: wide
-        show-mobile-header: true
-        columns:
-          - size: small
-            widgets: *left-sidebar-widgets
-          - size: full
-            widgets:
-              - type: bookmarks
-                style: cards
-                groups:
-                  - *grp-development
               # CPU / memory / disk / network for the host running these
               # dev services. Requires hostPath mounts of /proc and /sys
               # (see the Pod spec below) — remove this widget if you'd
               # rather not grant that access.
               - type: server-stats
+                cache: 15s
                 servers:
                   - type: local
                     name: lab-server
+                    hide-mountpoints-by-default: true
+                    mountpoints:
+                      "/":
+                        name: Root FS
+                        hide: false
 
-      - name: Admin & Network
-        width: wide
-        show-mobile-header: true
-        columns:
-          - size: small
-            widgets: *left-sidebar-widgets
-          - size: full
-            widgets:
-              - type: bookmarks
-                style: cards
-                groups:
-                  - *grp-admin
+      
 
 ---
 apiVersion: v1
