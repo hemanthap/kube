@@ -44,17 +44,17 @@ data:
             display: inline-block;
             padding: 0.3rem 0.75rem;
             border-radius: 999px;
-            border: 1px solid color-mix(in hsl, var(--bookmarks-group-color), white 8%);
+            border: 1px solid color-mix(in hsl, var(--bookmarks-group-color), var(--color-widget-content-border) 72%);
             background: linear-gradient(180deg,
-              color-mix(in hsl, var(--bookmarks-group-color), var(--color-widget-background) 72%),
-              color-mix(in hsl, var(--bookmarks-group-color), var(--color-widget-background) 82%));
-            color: color-mix(in hsl, white 88%, var(--bookmarks-group-color) 12%);
+              color-mix(in hsl, var(--bookmarks-group-color), var(--color-widget-background) 80%),
+              color-mix(in hsl, var(--bookmarks-group-color), var(--color-widget-background) 88%));
+            color: color-mix(in hsl, white 84%, var(--bookmarks-group-color) 8%);
             letter-spacing: 0.02em;
-            text-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
-            filter: saturate(0.72);
+            text-shadow: 0 1px 0 rgba(0, 0, 0, 0.16);
+            filter: saturate(0.58);
             box-shadow:
-              0 1px 0 rgba(255, 255, 255, 0.2) inset,
-              0 2px 6px rgba(0, 0, 0, 0.16);
+              0 1px 0 rgba(255, 255, 255, 0.12) inset,
+              0 1px 3px rgba(0, 0, 0, 0.1);
           }
 
           .widget-type-bookmarks .bookmarks-icon-container {
