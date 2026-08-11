@@ -9,8 +9,8 @@ spec:
   hostNetwork: true
   containers:
     - name: ntfy
-      image: docker.io/binwiederhier/ntfy:v2.11.0
-      args: ["serve", "--config", "/etc/ntfy/server.yml", "--listen-http", ":2586"]
+      image: docker.io/binwiederhier/ntfy:v2.27.0
+      args: ["serve", "--config", "/etc/ntfy/server.yml", "--listen-http", ":2586", "--web-root", "/"]
       ports:
         - containerPort: 2586
           hostPort: 2586

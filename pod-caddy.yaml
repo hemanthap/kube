@@ -22,6 +22,8 @@ data:
       reverse_proxy 127.0.0.1:2283
     }
     http://ntfy.home {
+      @ntfy_nocache path / /index.html /manifest.webmanifest /config.js /static/* /sw.js /service-worker.js
+      header @ntfy_nocache Cache-Control "no-store, must-revalidate"
       reverse_proxy 127.0.0.1:2586
     }
     http://grafana.home {
