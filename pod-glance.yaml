@@ -232,6 +232,9 @@ data:
                       - title: File Browser
                         url: http://filebrowser.home
                         icon: di:filebrowser
+                      - title: Rclone
+                        url: http://rclone.home
+                        icon: si:rclone
                       - title: Baikal Admin
                         url: http://baikal.home/admin
                         icon: di:baikal
