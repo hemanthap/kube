@@ -152,25 +152,25 @@ data:
               - type: bookmarks
                 style: cards
                 groups:
-                  - &grp-productivity
-                    title: Productivity
-                    color: "160 55 45"
+                  - &grp-admin
+                    title: Admin
+                    color: "35 80 55"
                     links:
-                      - title: Actual Budget
-                        url: http://budget.home
-                        icon: di:actual-budget
-                      - title: Linkding
-                        url: http://linkding.home
-                        icon: di:linkding
-                      - title: Memos
-                        url: http://memos.home
-                        icon: di:memos
-                      - title: AgenDAV Calendar
-                        url: http://agendav.home
-                        icon: mdi:calendar
-                      - title: BentoPDF
-                        url: http://bentopdf.home
-                        icon: di:bentopdf
+                      - title: Baikal Admin
+                        url: http://baikal.home/admin
+                        icon: di:baikal
+                      - title: Dozzle
+                        url: http://dozzle.home
+                        icon: di:dozzle
+                      - title: File Browser
+                        url: http://filebrowser.home
+                        icon: di:filebrowser
+                      - title: Headlamp
+                        url: http://headlamp.home
+                        icon: di:headlamp
+                      - title: Rclone
+                        url: http://rclone.home
+                        icon: si:rclone
                   - &grp-development
                     title: Development
                     color: "200 70 55"
@@ -181,67 +181,38 @@ data:
                       - title: Ollama
                         url: http://192.168.68.101:3000
                         icon: di:ollama
+                      - title: pgAdmin
+                        url: http://pgadmin.home
+                        icon: di:pgadmin
                       - title: Qdrant
                         url: http://qdrant.home/dashboard
                         icon: di:qdrant
                       - title: RedisInsight
                         url: http://redisinsight.home
                         icon: di:redis
-                      - title: pgAdmin
-                        url: http://pgadmin.home
-                        icon: di:pgadmin
                   - &grp-media
                     title: Media
                     color: "270 55 65"
                     links:
+                      - title: FreshRSS
+                        url: http://freshrss.home
+                        icon: di:freshrss
                       - title: Immich
                         url: http://immich.home
                         icon: di:immich
                       - title: Navidrome
                         url: http://navidrome.home
                         icon: di:navidrome
-                      - title: FreshRSS
-                        url: http://freshrss.home
-                        icon: di:freshrss
                       - title: ownCloud
                         url: http://owncloud.home
                         icon: di:owncloud
-                  - &grp-security
-                    title: Security
-                    color: "0 70 55"
-                    links:
-                      - title: go2rtc
-                        url: http://go2rtc.home
-                        icon: auto-invert di:go2rtc
-                      - title: Camera — Basement
-                        url: http://go2rtc.home/stream.html?src=tapo_camera_basement
-                        icon: auto-invert di:go2rtc
-                      - title: Camera — Living Room
-                        url: http://go2rtc.home/stream.html?src=tapo_camera_livingroom
-                        icon: auto-invert di:go2rtc
-                  - &grp-admin
-                    title: Admin
-                    color: "35 80 55"
-                    links:
-                      - title: Headlamp
-                        url: http://headlamp.home
-                        icon: di:headlamp
-                      - title: Dozzle
-                        url: http://dozzle.home
-                        icon: di:dozzle
-                      - title: File Browser
-                        url: http://filebrowser.home
-                        icon: di:filebrowser
-                      - title: Rclone
-                        url: http://rclone.home
-                        icon: si:rclone
-                      - title: Baikal Admin
-                        url: http://baikal.home/admin
-                        icon: di:baikal
                   - &grp-network
                     title: Network & Ops
                     color: "25 66 54"
                     links:
+                      - title: ntfy
+                        url: http://ntfy.home
+                        icon: mdi:bell-ring-outline
                       - title: Server Dashboard
                         url: http://lab.home:9090
                         icon: mdi:server
@@ -251,9 +222,38 @@ data:
                       - title: Technitium DNS
                         url: http://technitium.home
                         icon: di:technitium
-                      - title: ntfy
-                        url: http://ntfy.home
-                        icon: mdi:bell-ring-outline
+                  - &grp-productivity
+                    title: Productivity
+                    color: "160 55 45"
+                    links:
+                      - title: Actual Budget
+                        url: http://budget.home
+                        icon: di:actual-budget
+                      - title: AgenDAV Calendar
+                        url: http://agendav.home
+                        icon: mdi:calendar
+                      - title: BentoPDF
+                        url: http://bentopdf.home
+                        icon: di:bentopdf
+                      - title: Linkding
+                        url: http://linkding.home
+                        icon: di:linkding
+                      - title: Memos
+                        url: http://memos.home
+                        icon: di:memos
+                  - &grp-security
+                    title: Security
+                    color: "0 70 55"
+                    links:
+                      - title: Camera — Basement
+                        url: http://go2rtc.home/stream.html?src=tapo_camera_basement
+                        icon: auto-invert di:go2rtc
+                      - title: Camera — Living Room
+                        url: http://go2rtc.home/stream.html?src=tapo_camera_livingroom
+                        icon: auto-invert di:go2rtc
+                      - title: go2rtc
+                        url: http://go2rtc.home
+                        icon: auto-invert di:go2rtc
 
               # CPU / memory / disk / network for the host running these
               # dev services. Requires hostPath mounts of /proc and /sys
