@@ -111,6 +111,34 @@ data:
               grid-template-columns: 1fr;
             }
           }
+
+          /* Keep RSS in horizontal card layout but hide thumbnails */
+          .widget-type-rss .rss-card-image {
+            display: none;
+          }
+
+          .widget-type-rss .card .margin-bottom-widget {
+            margin-top: 0.6rem;
+          }
+
+          /* Markets ticker: show ~3 rows and scroll the rest */
+          .widget-type-markets .dynamic-columns {
+            --columns-per-row: 1;
+            max-height: 24rem;
+            overflow-y: auto;
+            padding-right: 0.35rem;
+          }
+
+          .widget-type-markets .dynamic-columns > * {
+            border-left: none;
+            padding-left: 0;
+          }
+
+          .widget-type-markets .dynamic-columns > *:not(:first-child) {
+            margin-top: 0.55rem;
+            padding-top: 0.55rem;
+            border-top: 1px solid var(--color-separator);
+          }
         </style>
 
     branding:
@@ -134,10 +162,6 @@ data:
         columns:
           - size: small
             widgets: &left-sidebar-widgets
-              - type: search
-                search-engine: duckduckgo
-                autofocus: true
-
               - type: calendar
                 first-day-of-week: monday
 
@@ -146,6 +170,29 @@ data:
                 timezones:
                   - timezone: Asia/Kolkata
                     label: Bangalore
+
+              - type: markets
+                title: Stock Market Tracker
+                sort-by: change
+                chart-link-template: https://www.tradingview.com/chart/?symbol={SYMBOL}
+                symbol-link-template: https://finance.yahoo.com/quote/{SYMBOL}
+                markets:
+                  - symbol: SPY
+                    name: S&P 500
+                  - symbol: FXAIX
+                    name: Fidelity 500 Index
+                  - symbol: AGTHX
+                    name: American Funds Growth
+                  - symbol: QQQ
+                    name: Nasdaq 100
+                  - symbol: IWF
+                    name: iShares Russell 1000 Growth
+                  - symbol: SMH
+                    name: VanEck Semiconductor ETF
+                  - symbol: VXUS
+                    name: Vanguard Total Intl Stock
+                  - symbol: VOOG
+                    name: Vanguard S&P 500 Growth
 
           - size: full
             widgets:
@@ -269,6 +316,15 @@ data:
                       "/":
                         name: Root FS
                         hide: false
+
+              - type: rss
+                title: FreshRSS Feed
+                style: horizontal-cards
+                limit: 12
+                collapse-after: 3
+                feeds:
+                  - url: http://freshrss.home/i/?a=rss
+                    title: FreshRSS
 
       
 
