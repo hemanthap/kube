@@ -13,22 +13,18 @@ spec:
   restartPolicy: Always
   containers:
     - name: filebrowser
-      image: filebrowser/filebrowser:latest
-      args:
-        - "--config"
-        - "/config/filebrowser.json"
-        - "--address"
-        - "0.0.0.0"
-        - "--port"
-        - "8080"
-        - "--database"
-        - "/database/filebrowser.db"
+      image: gtstef/filebrowser:stable
+      env:
+        - name: FILEBROWSER_DATABASE
+          value: /database/filebrowser.db
       ports:
         - name: http
-          containerPort: 8080
+          containerPort: 80
           hostPort: 7000
           protocol: TCP
       securityContext:
+        runAsUser: 0
+        runAsGroup: 0
         allowPrivilegeEscalation: false
         readOnlyRootFilesystem: false
       resources:
@@ -41,13 +37,13 @@ spec:
       livenessProbe:
         httpGet:
           path: /health
-          port: 8080
+          port: 80
         initialDelaySeconds: 10
         periodSeconds: 30
       readinessProbe:
         httpGet:
           path: /health
-          port: 8080
+          port: 80
         initialDelaySeconds: 5
         periodSeconds: 10
       volumeMounts:
@@ -78,7 +74,7 @@ spec:
         type: DirectoryOrCreate
     - name: database
       hostPath:
-        path: /var/lib/filebrowser/database
+        path: ${PERSISTENT_PATH}/filebrowser/database
         type: DirectoryOrCreate
     - name: tmp
       emptyDir:
