@@ -17,6 +17,8 @@ spec:
       env:
         - name: FILEBROWSER_DATABASE
           value: /database/filebrowser.db
+        - name: FILEBROWSER_CONFIG
+          value: /srv/dockerdata/filebrowser/config.yaml
       ports:
         - name: http
           containerPort: 80
@@ -29,11 +31,11 @@ spec:
         readOnlyRootFilesystem: false
       resources:
         requests:
-          memory: "128Mi"
-          cpu: "100m"
+          memory: "256Mi"
+          cpu: "200m"
         limits:
-          memory: "512Mi"
-          cpu: "500m"
+          memory: "1Gi"
+          cpu: "1000m"
       livenessProbe:
         httpGet:
           path: /health
