@@ -34,16 +34,11 @@ spec:
       volumeMounts:
         - name: config
           mountPath: /config
-        - name: backups
-          mountPath: /backups
         - name: onedrive-source
           mountPath: /onedrive
           readOnly: true
         - name: dropbox-source
           mountPath: /dropbox
-          readOnly: true
-        - name: source
-          mountPath: /source
           readOnly: true
         - name: localtime
           mountPath: /etc/localtime
@@ -53,10 +48,6 @@ spec:
       hostPath:
         path: ${PERSISTENT_PATH}/duplicati/config
         type: DirectoryOrCreate
-    - name: backups
-      hostPath:
-        path: ${PERSISTENT_PATH}/duplicati/backups
-        type: DirectoryOrCreate
     - name: onedrive-source
       hostPath:
         path: /home/admin/onedrive
@@ -64,10 +55,6 @@ spec:
     - name: dropbox-source
       hostPath:
         path: /srv/dockerdata
-        type: Directory
-    - name: source
-      hostPath:
-        path: ${PERSISTENT_PATH}
         type: Directory
     - name: localtime
       hostPath:
