@@ -218,6 +218,9 @@ data:
                       - title: Rclone
                         url: http://rclone.home
                         icon: si:rclone
+                      - title: duplicati
+                        url: http://duplicati.home
+                        icon: di:duplicati
                   - &grp-development
                     title: Development
                     color: "200 70 55"
