@@ -157,7 +157,7 @@ data:
       - name: Dashboard
         slug: home
         width: wide
-        hide-desktop-navigation: true
+        hide-desktop-navigation: false
         show-mobile-header: true
         columns:
           - size: small
@@ -171,60 +171,83 @@ data:
                   - timezone: Asia/Kolkata
                     label: Bangalore
 
-              - type: markets
-                title: Stock Market Tracker
-                sort-by: change
-                chart-link-template: https://www.tradingview.com/chart/?symbol={SYMBOL}
-                symbol-link-template: https://finance.yahoo.com/quote/{SYMBOL}
-                markets:
-                  - symbol: SPY
-                    name: S&P 500
-                  - symbol: FXAIX
-                    name: Fidelity 500 Index
-                  - symbol: AGTHX
-                    name: American Funds Growth
-                  - symbol: QQQ
-                    name: Nasdaq 100
-                  - symbol: IWF
-                    name: iShares Russell 1000 Growth
-                  - symbol: SMH
-                    name: VanEck Semiconductor ETF
-                  - symbol: VXUS
-                    name: Vanguard Total Intl Stock
-                  - symbol: VOOG
-                    name: Vanguard S&P 500 Growth
-
           - size: full
             widgets:
               - type: bookmarks
                 style: cards
                 groups:
-                  - &grp-admin
-                    title: Admin
-                    color: "35 80 55"
+                  - title: Core Apps
+                    color: "160 55 45"
                     links:
-                      - title: Baikal Admin
-                        url: http://baikal.home/admin
-                        icon: di:baikal
-                      - title: Dozzle
-                        url: http://dozzle.home
-                        icon: di:dozzle
+                      - title: Actual Budget
+                        url: http://budget.home
+                        icon: di:actual-budget
+                      - title: AgenDAV Calendar
+                        url: http://agendav.home
+                        icon: mdi:calendar
+                      - title: BentoPDF
+                        url: http://bentopdf.home
+                        icon: di:bentopdf
                       - title: File Browser
                         url: http://filebrowser.home
                         icon: di:filebrowser
-                      - title: Headlamp
-                        url: http://headlamp.home
-                        icon: di:headlamp
-                      - title: Rclone
-                        url: http://rclone.home
-                        icon: si:rclone
+                      - title: Linkding
+                        url: http://linkding.home
+                        icon: di:linkding
+                      - title: Memos
+                        url: http://memos.home
+                        icon: di:memos
+
+                  - title: Media
+                    color: "270 55 65"
+                    links:
+                      - title: FreshRSS
+                        url: http://freshrss.home
+                        icon: di:freshrss
+                      - title: Immich
+                        url: http://immich.home
+                        icon: di:immich
+                      - title: Navidrome
+                        url: http://navidrome.home
+                        icon: di:navidrome
+                      - title: ownCloud
+                        url: http://owncloud.home
+                        icon: di:owncloud
+
+                  - title: Ops
+                    color: "25 66 54"
+                    links:
+                      - title: Dozzle
+                        url: http://dozzle.home
+                        icon: di:dozzle
                       - title: duplicati
                         url: http://duplicati.home
                         icon: di:duplicati
-                  - &grp-development
-                    title: Development
+                      - title: Headlamp
+                        url: http://headlamp.home
+                        icon: di:headlamp
+                      - title: ntfy
+                        url: http://ntfy.home
+                        icon: mdi:bell-ring-outline
+                      - title: Rclone
+                        url: http://rclone.home
+                        icon: si:rclone
+                      - title: Server Dashboard
+                        url: http://lab.home:9090
+                        icon: mdi:server
+                      - title: Tailscale
+                        url: http://tailscale.home
+                        icon: mdi:vpn
+                      - title: Technitium DNS
+                        url: http://technitium.home
+                        icon: di:technitium
+
+                  - title: Dev & Data
                     color: "200 70 55"
                     links:
+                      - title: go2rtc
+                        url: http://go2rtc.home
+                        icon: auto-invert di:go2rtc
                       - title: n8n
                         url: http://n8n.home
                         icon: di:n8n
@@ -240,96 +263,6 @@ data:
                       - title: RedisInsight
                         url: http://redisinsight.home
                         icon: di:redis
-                  - &grp-media
-                    title: Media
-                    color: "270 55 65"
-                    links:
-                      - title: FreshRSS
-                        url: http://freshrss.home
-                        icon: di:freshrss
-                      - title: Immich
-                        url: http://immich.home
-                        icon: di:immich
-                      - title: Navidrome
-                        url: http://navidrome.home
-                        icon: di:navidrome
-                      - title: ownCloud
-                        url: http://owncloud.home
-                        icon: di:owncloud
-                  - &grp-network
-                    title: Network & Ops
-                    color: "25 66 54"
-                    links:
-                      - title: ntfy
-                        url: http://ntfy.home
-                        icon: mdi:bell-ring-outline
-                      - title: Server Dashboard
-                        url: http://lab.home:9090
-                        icon: mdi:server
-                      - title: Tailscale
-                        url: http://tailscale.home
-                        icon: mdi:vpn
-                      - title: Technitium DNS
-                        url: http://technitium.home
-                        icon: di:technitium
-                  - &grp-productivity
-                    title: Productivity
-                    color: "160 55 45"
-                    links:
-                      - title: Actual Budget
-                        url: http://budget.home
-                        icon: di:actual-budget
-                      - title: AgenDAV Calendar
-                        url: http://agendav.home
-                        icon: mdi:calendar
-                      - title: BentoPDF
-                        url: http://bentopdf.home
-                        icon: di:bentopdf
-                      - title: Linkding
-                        url: http://linkding.home
-                        icon: di:linkding
-                      - title: Memos
-                        url: http://memos.home
-                        icon: di:memos
-                  - &grp-security
-                    title: Security
-                    color: "0 70 55"
-                    links:
-                      - title: Camera — Basement
-                        url: http://go2rtc.home/stream.html?src=tapo_camera_basement
-                        icon: auto-invert di:go2rtc
-                      - title: Camera — Living Room
-                        url: http://go2rtc.home/stream.html?src=tapo_camera_livingroom
-                        icon: auto-invert di:go2rtc
-                      - title: go2rtc
-                        url: http://go2rtc.home
-                        icon: auto-invert di:go2rtc
-
-              # CPU / memory / disk / network for the host running these
-              # dev services. Requires hostPath mounts of /proc and /sys
-              # (see the Pod spec below) — remove this widget if you'd
-              # rather not grant that access.
-              - type: server-stats
-                cache: 15s
-                servers:
-                  - type: local
-                    name: lab-server
-                    hide-mountpoints-by-default: true
-                    mountpoints:
-                      "/":
-                        name: Root FS
-                        hide: false
-
-              - type: rss
-                title: FreshRSS Feed
-                style: horizontal-cards
-                limit: 12
-                collapse-after: 3
-                feeds:
-                  - url: http://freshrss.home/i/?a=rss
-                    title: FreshRSS
-
-      
 
 ---
 apiVersion: v1
@@ -390,13 +323,6 @@ spec:
           mountPath: /app/data
         - name: tmp
           mountPath: /tmp
-        # Only needed if you keep the server-stats widget above.
-        - name: proc
-          mountPath: /host/proc
-          readOnly: true
-        - name: sys
-          mountPath: /host/sys
-          readOnly: true
   volumes:
     - name: glance-config
       configMap:
@@ -407,11 +333,3 @@ spec:
         type: DirectoryOrCreate
     - name: tmp
       emptyDir: {}
-    - name: proc
-      hostPath:
-        path: /proc
-        type: Directory
-    - name: sys
-      hostPath:
-        path: /sys
-        type: Directory
