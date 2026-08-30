@@ -171,6 +171,17 @@ data:
                   - timezone: Asia/Kolkata
                     label: Bangalore
 
+              - type: server-stats
+                cache: 15s
+                servers:
+                  - type: local
+                    name: lab-server
+                    hide-mountpoints-by-default: true
+                    mountpoints:
+                      "/":
+                        name: Root FS
+                        hide: false
+
           - size: full
             widgets:
               - type: bookmarks
@@ -323,6 +334,12 @@ spec:
           mountPath: /app/data
         - name: tmp
           mountPath: /tmp
+        - name: proc
+          mountPath: /host/proc
+          readOnly: true
+        - name: sys
+          mountPath: /host/sys
+          readOnly: true
   volumes:
     - name: glance-config
       configMap:
@@ -333,3 +350,11 @@ spec:
         type: DirectoryOrCreate
     - name: tmp
       emptyDir: {}
+    - name: proc
+      hostPath:
+        path: /proc
+        type: Directory
+    - name: sys
+      hostPath:
+        path: /sys
+        type: Directory
