@@ -1,0 +1,108 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cloudsync
+  labels:
+    app: cloudsync
+spec:
+  restartPolicy: Always
+  containers:
+    - name: onedrive-alpine
+      image: alpine:3.20
+      stdin: true
+      tty: true
+      command:
+        - /bin/sh
+        - -c
+      args:
+        - |
+          apk add --no-cache onedrive curl libcurl tzdata ca-certificates >/tmp/apk-install.log 2>&1 || {
+            echo "Failed to install OneDrive runtime dependencies."
+            cat /tmp/apk-install.log
+            sleep 300
+            exit 1
+          }
+
+          while true; do
+            if [ ! -f /onedrive/conf/config ]; then
+              echo "Missing /onedrive/conf/config. Exec into this container and run: onedrive --confdir /onedrive/conf --syncdir /onedrive/data"
+              sleep 60
+              continue
+            fi
+
+            if ! grep -q '^refresh_token *= *' /onedrive/conf/config; then
+              echo "OneDrive token missing in /onedrive/conf/config. Waiting for one-time auth."
+              sleep 60
+              continue
+            fi
+
+            onedrive --monitor --confdir /onedrive/conf --syncdir /onedrive/data --verbose || true
+            echo "OneDrive monitor exited. Retrying in 30 seconds."
+            sleep 30
+          done
+      env:
+        - name: TZ
+          value: America/New_York
+      resources:
+        requests:
+          memory: "128Mi"
+          cpu: "50m"
+        limits:
+          memory: "512Mi"
+          cpu: "500m"
+      volumeMounts:
+        - name: onedrive-config
+          mountPath: /onedrive/conf
+        - name: onedrive-data
+          mountPath: /onedrive/data
+
+    - name: dropbox
+      image: islamdiaa/dropbox-docker:latest
+      env:
+        - name: TZ
+          value: America/New_York
+        - name: DROPBOX_UID
+          value: "1000"
+        - name: DROPBOX_GID
+          value: "1000"
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "50m"
+        limits:
+          memory: "512Mi"
+          cpu: "500m"
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+          add:
+            - CHOWN
+            - SETUID
+            - SETGID
+            - FOWNER
+            - DAC_OVERRIDE
+      volumeMounts:
+        - name: dropbox-config
+          mountPath: /opt/dropbox
+        - name: dropbox-data
+          mountPath: /opt/dropbox/Dropbox
+
+  volumes:
+    - name: onedrive-config
+      hostPath:
+        path: /home/admin/onedrive/conf
+        type: DirectoryOrCreate
+    - name: onedrive-data
+      hostPath:
+        path: /home/admin/onedrive
+        type: DirectoryOrCreate
+    - name: dropbox-config
+      hostPath:
+        path: ${PERSISTENT_PATH}/dropbox/config
+        type: DirectoryOrCreate
+    - name: dropbox-data
+      hostPath:
+        path: /srv/dockerdata
+        type: DirectoryOrCreate

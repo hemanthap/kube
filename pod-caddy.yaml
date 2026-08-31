@@ -101,6 +101,9 @@ data:
     http://freshrss.home {
       reverse_proxy 127.0.0.1:9500
     }
+    http://fireflyiii.home {
+      reverse_proxy 127.0.0.1:9600
+    }
     http://ollamallm.home {
       reverse_proxy 127.0.0.1:11434
     }

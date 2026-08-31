@@ -1,0 +1,66 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fireflyiii
+  labels:
+    app: fireflyiii
+spec:
+  restartPolicy: Always
+  initContainers:
+    - name: init-firefly-permissions
+      image: docker.io/library/alpine:3.20
+      command:
+        - /bin/sh
+        - -c
+        - chown -R 33:33 /var/www/html/storage
+      volumeMounts:
+        - mountPath: /var/www/html/storage
+          name: fireflyiii-storage
+  containers:
+    - name: fireflyiii
+      image: docker.io/fireflyiii/core:latest
+      env:
+        - name: APP_ENV
+          value: "local"
+        - name: APP_DEBUG
+          value: "false"
+        - name: APP_KEY
+          value: "${FIREFLY_APP_KEY}"
+        - name: APP_URL
+          value: "${FIREFLY_APP_URL}"
+        - name: TZ
+          value: "America/New_York"
+        - name: DB_CONNECTION
+          value: "pgsql"
+        - name: DB_HOST
+          value: "${POSTGRES_HOST}"
+        - name: DB_PORT
+          value: "${POSTGRES_PORT}"
+        - name: DB_DATABASE
+          value: "${FIREFLY_DB_NAME}"
+        - name: DB_USERNAME
+          value: "${POSTGRES_USER}"
+        - name: DB_PASSWORD
+          value: "${POSTGRES_PASSWORD}"
+        - name: TRUSTED_PROXIES
+          value: "**"
+      ports:
+        - containerPort: 8080
+          hostPort: 9600
+      volumeMounts:
+        - mountPath: /var/www/html/storage
+          name: fireflyiii-storage
+      resources:
+        requests:
+          memory: "256Mi"
+          cpu: "200m"
+        limits:
+          memory: "1Gi"
+          cpu: "1000m"
+
+  volumes:
+    - name: fireflyiii-storage
+      hostPath:
+        path: ${PERSISTENT_PATH}/fireflyiii
+        type: DirectoryOrCreate
