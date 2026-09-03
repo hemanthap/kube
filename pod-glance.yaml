@@ -14,19 +14,26 @@ data:
           /* 3D styling for bookmark groups and links */
           .widget-type-bookmarks .dynamic-columns {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 1rem 1.15rem;
+            grid-template-columns: repeat(2, minmax(260px, 1fr));
+            grid-auto-rows: 1fr;
+            gap: 0.9rem 1rem;
+            width: 80%;
+            max-width: 80%;
+            margin: 0;
+            justify-content: stretch;
+            justify-items: stretch;
+            align-items: stretch;
           }
 
           .widget-type-bookmarks .bookmarks-group {
             background: linear-gradient(160deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 14px;
-            padding: 0.9rem 1rem;
+            border-radius: 12px;
+            padding: 0.35rem 0.6rem 0.45rem;
             box-shadow:
               0 1px 0 rgba(255, 255, 255, 0.12) inset,
               0 -1px 0 rgba(0, 0, 0, 0.18) inset,
-              0 6px 14px rgba(0, 0, 0, 0.14);
+              0 4px 10px rgba(0, 0, 0, 0.12);
             transform: translateZ(0);
             transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
           }
@@ -42,7 +49,7 @@ data:
 
           .widget-type-bookmarks .bookmarks-group-title {
             display: inline-block;
-            padding: 0.3rem 0.75rem;
+            padding: 0.25rem 0.7rem;
             border-radius: 999px;
             border: 1px solid color-mix(in hsl, var(--bookmarks-group-color), var(--color-widget-content-border) 72%);
             background: linear-gradient(180deg,
@@ -187,45 +194,7 @@ data:
               - type: bookmarks
                 style: cards
                 groups:
-                  - title: Core Apps
-                    color: "160 55 45"
-                    links:
-                      - title: Actual Budget
-                        url: http://budget.home
-                        icon: di:actual-budget
-                      - title: AgenDAV Calendar
-                        url: http://agendav.home
-                        icon: mdi:calendar
-                      - title: BentoPDF
-                        url: http://bentopdf.home
-                        icon: di:bentopdf
-                      - title: File Browser
-                        url: http://filebrowser.home
-                        icon: di:filebrowser
-                      - title: Linkding
-                        url: http://linkding.home
-                        icon: di:linkding
-                      - title: Memos
-                        url: http://memos.home
-                        icon: di:memos
-
-                  - title: Media
-                    color: "270 55 65"
-                    links:
-                      - title: FreshRSS
-                        url: http://freshrss.home
-                        icon: di:freshrss
-                      - title: Immich
-                        url: http://immich.home
-                        icon: di:immich
-                      - title: Navidrome
-                        url: http://navidrome.home
-                        icon: di:navidrome
-                      - title: ownCloud
-                        url: http://owncloud.home
-                        icon: di:owncloud
-
-                  - title: Ops
+                  - title: Infrastructure
                     color: "25 66 54"
                     links:
                       - title: Dozzle
@@ -253,12 +222,9 @@ data:
                         url: http://technitium.home
                         icon: di:technitium
 
-                  - title: Dev & Data
+                  - title: Development & Data
                     color: "200 70 55"
                     links:
-                      - title: go2rtc
-                        url: http://go2rtc.home
-                        icon: auto-invert di:go2rtc
                       - title: n8n
                         url: http://n8n.home
                         icon: di:n8n
@@ -274,6 +240,47 @@ data:
                       - title: RedisInsight
                         url: http://redisinsight.home
                         icon: di:redis
+
+                  - title: Media
+                    color: "270 55 65"
+                    links:
+                      - title: FreshRSS
+                        url: http://freshrss.home
+                        icon: di:freshrss
+                      - title: go2rtc
+                        url: http://go2rtc.home
+                        icon: auto-invert di:go2rtc
+                      - title: Immich
+                        url: http://immich.home
+                        icon: di:immich
+                      - title: Navidrome
+                        url: http://navidrome.home
+                        icon: di:navidrome
+                      - title: ownCloud
+                        url: http://owncloud.home
+                        icon: di:owncloud
+
+                  - title: Daily Apps
+                    color: "160 55 45"
+                    links:
+                      - title: Actual Budget
+                        url: http://budget.home
+                        icon: di:actual-budget
+                      - title: AgenDAV Calendar
+                        url: http://agendav.home
+                        icon: mdi:calendar
+                      - title: BentoPDF
+                        url: http://bentopdf.home
+                        icon: di:bentopdf
+                      - title: File Browser
+                        url: http://filebrowser.home
+                        icon: di:filebrowser
+                      - title: Linkding
+                        url: http://linkding.home
+                        icon: di:linkding
+                      - title: Memos
+                        url: http://memos.home
+                        icon: di:memos
 
 ---
 apiVersion: v1
