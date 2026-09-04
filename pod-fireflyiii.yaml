@@ -28,7 +28,7 @@ spec:
         - name: APP_KEY
           value: "${FIREFLY_APP_KEY}"
         - name: APP_URL
-          value: "${FIREFLY_APP_URL}"
+          value: "http://fireflyiii.home"
         - name: TZ
           value: "America/New_York"
         - name: DB_CONNECTION
@@ -45,6 +45,8 @@ spec:
           value: "${POSTGRES_PASSWORD}"
         - name: TRUSTED_PROXIES
           value: "**"
+        - name: STATIC_CRON_TOKEN
+          value: "${FIREFLY_CRON_TOKEN}"
       ports:
         - containerPort: 8080
           hostPort: 9600
@@ -64,3 +66,47 @@ spec:
       hostPath:
         path: ${PERSISTENT_PATH}/fireflyiii
         type: DirectoryOrCreate
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fireflyiii
+  labels:
+    app: fireflyiii
+spec:
+  selector:
+    app: fireflyiii
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: fireflyiii-cron
+spec:
+  # Runs every 30 minutes so a single missed window doesn't cost a whole
+  # cycle of recurring transactions, bills, or budgets.
+  schedule: "*/30 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: fireflyiii-cron
+              image: docker.io/curlimages/curl:latest
+              env:
+                - name: FIREFLY_CRON_TOKEN
+                  value: "${FIREFLY_CRON_TOKEN}"
+              command:
+                - /bin/sh
+                - -c
+                - "curl -fsS http://fireflyiii.home/api/v1/cron/${FIREFLY_CRON_TOKEN}"
